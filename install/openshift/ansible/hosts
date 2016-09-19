@@ -1,0 +1,21 @@
+[OSEv3:children]
+masters
+nodes
+
+[masters]
+master.latam.forum.redhat.com openshift_hostname=master.latam.forum.redhat.com
+
+[nodes]
+master.latam.forum.redhat.com openshift_hostname=master.latam.forum.redhat.com openshift_public_hostname=openshift.forum.rhtechofficelatam.com
+infra.latam.forum.redhat.com openshift_node_labels="{'host': 'infra'}" openshift_hostname=infra.latam.forum.redhat.com
+node1.latam.forum.redhat.com openshift_hostname=node1.latam.forum.redhat.com
+node2.latam.forum.redhat.com openshift_hostname=node2.latam.forum.redhat.com
+
+[OSEv3:vars]
+deployment_type=openshift-enterprise
+
+## htpasswd auth
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/openshift-passwords'}]
+
+#### # Defining htpasswd users
+openshift_master_htpasswd_users={'demo': '$apr1$ucdyfv6b$EJFanTIfig6LR8cszOnKV0', 'mauricio': '$apr1$cUEhxniK$.dvXBcd9XE6BmSpeWnb2o.'}
