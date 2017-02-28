@@ -1,0 +1,240 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "autoscaler-template",
+        "creationTimestamp": null,
+        "annotations": {
+            "description": "An example PHP application with autoscaling",
+            "iconClass": "icon-php",
+            "tags": "instant-app,php"
+        }
+    },
+    "objects": [
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "autoscaler",
+                "labels": {
+                    "app": "autoscaler"
+                },
+                "annotations": {
+                    "description": "Exposes and load balances the application pods"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "web",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    }
+                ],
+                "selector": {
+                    "name": "autoscaler"
+                }
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "autoscaler",
+                "labels": {
+                    "app": "autoscaler"
+                }
+            },
+            "spec": {
+                "host": "${APPLICATION_DOMAIN}",
+                "to": {
+                    "kind": "Service",
+                    "name": "autoscaler"
+                },
+                "port": {
+                    "targetPort": 8080
+                }
+            }
+        },
+        {
+            "kind": "ImageStream",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "autoscaler",
+                "annotations": {
+                    "description": "Keeps track of changes in the application image"
+                },
+                "labels": {
+                    "app": "autoscaler"
+                }
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "autoscaler",
+                "annotations": {
+                    "description": "Defines how to build the application"
+                },
+                "labels": {
+                    "app": "autoscaler"
+                }
+            },
+            "spec": {
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "${SOURCE_REPOSITORY_URL}",
+                        "ref": "${SOURCE_REPOSITORY_REF}"
+                    },
+                    "contextDir": "${CONTEXT_DIR}"
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "openshift",
+                            "name": "php:5.6"
+                        }
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "autoscaler:latest"
+                    }
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange"
+                    },
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "${GITHUB_WEBHOOK_SECRET}"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "autoscaler",
+                "annotations": {
+                    "description": "Defines how to deploy the application server"
+                },
+                "labels": {
+                    "app": "autoscaler"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Rolling",
+                    "rollingParams": {
+                        "updatePeriodSeconds": 1,
+                        "intervalSeconds": 1,
+                        "timeoutSeconds": 600,
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    }
+                },
+                "triggers": [
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "autoscaler"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "name": "autoscaler:latest"
+                            }
+                        }
+                    },
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "replicas": 1,
+                "selector": {
+                    "name": "autoscaler"
+                },
+                "template": {
+                    "metadata": {
+                        "labels": {
+                            "name": "autoscaler",
+                            "app": "autoscaler"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "autoscaler",
+                                "image": "autoscaler",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "DATABASE_SERVICE_NAME",
+                                        "value": "${DATABASE_SERVICE_NAME}"
+                                    }
+                                ],
+                                "resources": {
+                                    "limits": {
+                                        "cpu": "100m",
+                                        "memory": "100Mi"
+                                    },
+                                    "requests": {
+                                        "cpu": "100m",
+                                        "memory": "100Mi"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            "status": {}
+        }
+    ],
+    "parameters": [
+        {
+            "name": "SOURCE_REPOSITORY_URL",
+            "description": "The URL of the repository with your application source code",
+            "value": "https://github.com/openshift/cakephp-ex.git"
+        },
+        {
+            "name": "SOURCE_REPOSITORY_REF",
+            "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch"
+        },
+        {
+            "name": "CONTEXT_DIR",
+            "description": "Set this to the relative path to your project if it is not in the root of your repository"
+        },
+        {
+            "name": "APPLICATION_DOMAIN",
+            "description": "The exposed hostname that will route to the CakePHP service, if left blank a value will be defaulted."
+        },
+        {
+            "name": "GITHUB_WEBHOOK_SECRET",
+            "description": "A secret string used to configure the GitHub webhook",
+            "generate": "expression",
+            "from": "[a-zA-Z0-9]{40}"
+        }
+    ],
+    "labels": {
+        "template": "autoscaler"
+    }
+}
