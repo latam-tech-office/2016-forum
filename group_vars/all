@@ -1,0 +1,71 @@
+### 
+# LATAM Red Hat Forum 2016 Demo
+#
+### GENERAL GENERAL GENERAL GENERAL GENERAL GENERAL GENERAL GENERAL GENERAL GENERAL 
+###   GENERAL GENERAL GENERAL GENERAL GENERAL GENERAL GENERAL GENERAL GENERAL GENERAL 
+# This is general information that most applications will use to configure each 
+# application
+#
+# All applications will be installed for this User
+username: demo
+password: r3dh4t1!
+
+### OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT 
+openshift_domain: example.com
+openshift_cloudapps_domain: cloudapps.{{ openshift_domain }}
+
+### RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP 
+###   RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP 
+rhmap_subscription_manager_repositories:
+      - rhel-7-server-rhmap-4.2-rpms
+rhmap_subscription_manager_templates:
+      - rhmap-fh-openshift-templates
+      - fh-system-dump-tool
+
+# Information specific to RHMAP Core and MBaaS
+rhmap_project_core: "rhmap-core"
+# (OPTIONAL) Get all the components of RHMAP core to run in a particular node.
+#            Before using this, be sure to label each Node as such:
+#            Example (RHMAP Core running in 2 Nodes): 
+#            # oc label node/node1.example.com rhmap=core
+#            # oc label node/node2.example.com rhmap=core
+#rhmap_selector_core: "rhmap=core"
+rhmap_project_mbaas: "rhmap-mbaas"
+
+# (OPTIONAL) Get all the components of RHMAP core to run in a particular node.
+#            Before using this, be sure to label each Node as such:
+#            Example (RHMAP MBaaS running in 2 Nodes):
+#            # oc label node/node3.example.com rhmap=mbaas
+#            # oc label node/node4.example.com rhmap=mbaas
+#rhmap_selector_mbaas: "rhmap=mbaas" 
+rhmap_directory_rhmap: /opt/rhmap/templates
+
+# Specific variables used into RHMAP Core
+rhmap_smtp_server: "localhost"
+rhmap_smtp_username: "username"
+rhmap_smtp_password: "password"
+rhmap_smtp_from_address: "nagios@example.com"
+rhmap_admin_email:  "root@localhost"
+rhmap_smtp_port: "25"
+rhmap_smtp_auth: "false"
+rhmap_smtp_tls: "false"
+rhmap_email_replyto: "noreply@localhost"
+rhmap_builder_android_service_host: "<androidbuildfarmurl>"
+rhmap_builder_iphone_service_host: "<iphonebuildfarmurl>"
+
+### CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS 
+###   CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS 
+cloudforms_namespace: cloudforms
+cloudforms_username: admin
+cloudforms_password: smartvm
+cloudforms_http_type: https
+
+### ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER 
+###   ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER
+ansibletower_namespace: ansible-tower
+#ansibletower_dockerimage: rcalvaga/rhel7_ansible_tower
+ansibletower_dockerimage: jbla/ansible-tower
+ansible_tower_url: "https://tower.{{ ansibletower_namespace }}.svc.cluster.local"
+ansibletower_license_file: license_b4451138a0004212ac8476cc275a08e9.txt
+ansibletower_username: admin
+ansibletower_password: password
