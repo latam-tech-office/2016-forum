@@ -70,37 +70,48 @@
   command: oc get service/cloudforms --output jsonpath='{..spec.ports[?(@.name=="{{ cloudforms_http_type }}")].port}' --namespace {{ cloudforms_namespace }}
   register: cloudforms_port
   tags: 
+     - configcloudforms
      - cloudforms                 
 
 - name: Fetch CloudForms Address
   command: oc get service/cloudforms --output jsonpath='{..spec.clusterIP}' --namespace {{ cloudforms_namespace }}
   register: cloudforms_ip
   tags: 
+     - configcloudforms
      - cloudforms                 
 
 - name: Define CloudForms URL
   set_fact: cloudforms_url='cloudforms.{{ cloudforms_namespace }}.svc.cluster.local:{{ cloudforms_port.stdout }}'
   tags: 
-         - cloudforms
+     - configcloudforms
+     - cloudforms
                   
 - name: Define CloudForms FULL URL
   set_fact: cloudforms_full_url='{{ cloudforms_http_type }}{{ ':' }}//{{ cloudforms_url }}'
   tags:
+     - configcloudforms
      - cloudforms
                   
 - name: Wait for CloudForms to be up{{ ':' }} {{ cloudforms_full_url }}
   uri: url='{{ cloudforms_full_url }}' validate_certs=no status_code=200 
   register: cloudforms_wait
   until: cloudforms_wait.status == 200
-  retries: 60
+  retries: 100
   delay: 10
   tags: 
+     - configcloudforms
      - cloudforms             
+
+- name: Wait Business Central to settle down a while
+  pause: seconds=60
+  tags:
+     - cloudforms
 
 - name: Fetch a Token from Management Infrastructure
   command: oc serviceaccounts get-token management-admin --namespace management-infra
   register: management_infra_token
   tags: 
+     - configcloudforms
      - cloudforms                 
     
 - name: Adding {{ username }} user to CloudForms
@@ -119,7 +130,7 @@
   tags:
      - configcloudforms
      - createuserscloudforms
-         - cloudforms                   
+     - cloudforms                   
   
 - name: Adding Red Hat Forum LATAM 2016 Tenant to CloudForms
   uri:
@@ -169,7 +180,7 @@
     password: "{{ cloudforms_password }}"
     force_basic_auth: yes
     status_code: 200
-    body: '{"type":"ManageIQ::Providers::AnsibleTower::Provider","tenant_id":1000000000002,"name":"Ansible Tower 3","url":"https://tower.{{ ansibletower_namespace }}.svc.cluster.local","credentials": {"userid":"{{ ansible_username }}","password":"{{ ansible_password }}"}}'
+    body: '{"type":"ManageIQ::Providers::AnsibleTower::Provider","tenant_id":1000000000002,"name":"Ansible Tower 3","url":"https://tower.{{ ansibletower_namespace }}.svc.cluster.local","credentials": {"userid":"{{ ansibletower_username }}","password":"{{ ansibletower_password }}"}}'
   ignore_errors: True
   tags:
      - configcloudforms
