@@ -1,89 +1,24 @@
 #!/usr/bin/env ansible-playbook
 ---
-- name: This playbook must be run as OpenShift's Administrator{{ ':' }} system:admin
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: Log as OpenShift's Administrator{{ ':' }} system:admin
-      command: oc login --username=system:admin --insecure-skip-tls-verify
-      tags:
-         - check  
-
-
 - name: Check if all OpenShift's Hosts is registered using Red Hat's Subscription Manager
   hosts: openshift-hosts
-  tasks: 
-    - name: Check if all OpenShift's host is subscribed using Subscription Manager
-      command: subscription-manager status
-      register: subscription_status
-      failed_when: '"Current" not in subscription_status.stdout'
-      tags:
-         - check
-
-
-### RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP 
-###   RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP 
-- name: RHMAP 4.2{{ ':' }} Subscribe all OpenShift's Hosts to RHMAP Repositories
-  hosts: openshift-hosts
   roles: 
-    - rhmap_subscribe
+     - rhmap_subscribe
 
-- name: RHMAP 4.2{{ ':' }} Installing RHMAP Templates in this host
+- name: Installing LATAM Red Hat Forum 2016 Demo
   hosts: localhost
   connection: local
   tasks:
-     - name: Installing all the necessary templates
-       yum: name={{ item }} state=present
-       with_items: "{{ rhmap_subscription_manager_templates }}"
+     - name: Log as OpenShift's Administrator{{ ':' }} system:admin
+       command: oc login --username=system:admin --insecure-skip-tls-verify
        tags:
-          - templates
-          - install_rhmap
-
-- name: RHMAP 4.2{{ ':' }} Installing both RHMAP Core and MBaaS
-  hosts: localhost
-  connection: local
+          - check
   roles: 
+     - tower
+     - cloudforms
+     - locust
+     - tooling
+     - business_central
+     - microservices
      - rhmap_core
      - rhmap_mbaas
-
-### ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER 
-###   ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER 
-- name: Red Hat Ansible Tower
-  hosts: localhost
-  connection: local
-  roles:
-      - tower
-
-### CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS 
-###   CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS CLOUDFORMS 
-- name: Red Hat CloudForms
-  hosts: localhost
-  connection: local
-  roles:
-      - cloudforms
-
-
-### LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST 
-####   LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST
-- name: Locust
-  hosts: localhost
-  connection: local
-  roles:
-      - locust
-
-### TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING
-####   TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING
-- name: Tooling
-  hosts: localhost
-  connection: local
-  roles:
-      - tooling 
-
-### BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL 
-####   BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL
-- name: Business Central
-  hosts: localhost
-  connection: local
-  roles: 
-      - business_central
-

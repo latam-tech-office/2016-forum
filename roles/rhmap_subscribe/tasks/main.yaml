@@ -1,10 +1,19 @@
+- name: Check if all OpenShift's host is subscribed using Subscription Manager
+  command: subscription-manager status
+  register: subscription_status
+  failed_when: '"Current" not in subscription_status.stdout'
+  tags:
+     - check
+     - subscribe
+     - rhmap
+
 - name: Check if variable is defined{{ ':'}}  rhmap_subscription_manager_repositories
   fail: msg="Variable 'rhmap_subscription_manager_repositories' wasn't defined"
   when: rhmap_subscription_manager_repositories is not defined
   tags:
      - subscribe
      - check
-     - install_rhmap
+     - rhmap
 
 - name: Check if variable is defined{{ ':' }} rhmap_subscription_manager_template
   fail: msg="Variable 'rhmap_subscription_manager_templates' wasn't defined" 
@@ -12,29 +21,29 @@
   tags:
      - subscribe
      - check
-     - install_rhmap
+     - rhmap
 
 - name: Enable all the necessary repositories 
   command: subscription-manager repos --enable={{ item }}
   with_items: "{{ rhmap_subscription_manager_repositories }}"
   tags:
      - subscribe
-     - install_rhmap
+     - rhmap
 
 - name: Update all packages based on the latest repositories
   yum: name='*' state=latest update_cache=yes
   tags:
      - subscribe
-     - install_rhmap
+     - rhmap
 
 - name: Installing RHSM plugin subscription-manager-plugin-container
   yum: name="subscription-manager-plugin-container" state=present
   tags:
      - subscribe
-     - install_rhmap
+     - rhmap
 
 - name: Running rhsmcertd-worker to refresh the local certificate store
   command: /usr/libexec/rhsmcertd-worker
   tags:
      - subscribe
-     - install_rhmap
+     - rhmap

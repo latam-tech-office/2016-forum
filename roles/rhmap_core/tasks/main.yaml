@@ -1,4 +1,10 @@
----
+- name: Installing all the necessary templates for RHMAP
+  yum: name={{ item }} state=present
+  with_items: "{{ rhmap_subscription_manager_templates }}"
+  tags:
+     - templates
+     - rhmap
+
 - name: "Remove any possible existing ssh keys"
   file: path=/tmp/{{ item }} state=absent force=yes
   ignore_errors: True
@@ -8,33 +14,33 @@
      - gitlab_shell_id_rsa
      - gitlab_shell_id_rsa.pub
   tags: 
-     - install_rhmap_core
+     - rhmap_core
      - cleanup
-     - install_rhmap
+     - rhmap
 
 - name: Delete any previous scc created named anyuid-with-chroot
   command: oc delete scc/anyuid-with-chroot
   ignore_errors: True
   tags:
-     - install_rhmap_core
+     - rhmap_core
      - cleanup
-     - install_rhmap
+     - rhmap
 
 - name: Delete any previous ServiceAccount previously created
   command: oc delete serviceaccount/nagios --namespace {{ rhmap_project_core }}
   ignore_errors: True
   tags:
-     - install_rhmap_core
+     - rhmap_core
      - cleanup
-     - install_rhmap
+     - rhmap
 
 - name: Delete any previously Created Project name \"{{ rhmap_project_core }}\"
   command: oc delete project {{ rhmap_project_core }} 
   ignore_errors: True
   tags: 
-     - install_rhmap_core
+     - rhmap_core
      - cleanup
-     - install_rhmap
+     - rhmap
 
 - name: "Create a Core Project named \"{{ rhmap_project_core }}\""
   command: "oadm new-project {{ rhmap_project_core }} --display-name=\"RHMAP Core{{ ':' }} LATAM Red Hat Forum 2016\" --admin={{ username }}"
@@ -43,121 +49,121 @@
   retries: 25
   delay: 10
   tags:
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Make sure this project runs only on a Node {{ rhmap_selector_core }}"
   command: "oc patch namespace/{{ rhmap_project_core }} --patch='{\"metadata\": {\"annotations\": {\"openshift.io/node-selector\": \"{{ rhmap_selector_core }}\" }}}' --namespace {{ rhmap_project_core }}"
   when: rhmap_selector_core is defined
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Creating a Service Account for Nagios"
   command: oc create serviceaccount nagios --namespace {{ rhmap_project_core }}
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Add Role ServiceAccount Nagios as an Admin"
   command: oc policy add-role-to-user admin --serviceaccount=nagios --namespace {{ rhmap_project_core }}
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Create Monitoring Resouces"
   command: oc new-app --file {{ rhmap_directory_rhmap }}/core/fh-core-monitoring.json --param SMTP_SERVER={{ rhmap_smtp_server }} --param SMTP_USERNAME={{ rhmap_smtp_username }} --param SMTP_PASSWORD={{ rhmap_smtp_password }} --param SMTP_FROM_ADDRESS={{ rhmap_smtp_from_address }} --param ADMIN_EMAIL={{ rhmap_admin_email }} --param RHMAP_HOSTGROUPS="core" --namespace {{ rhmap_project_core }}
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Create SSH keys RepoAdmin"
   command: "ssh-keygen -q -N \'\' -C \"repoadmin_id_rsa\" -f \"/tmp/repoadmin_id_rsa\""
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Create SSH keys GitShell"
   command: "ssh-keygen -q -N \'\' -C \"gitlab_shell_id_rsa\" -f \"/tmp/gitlab_shell_id_rsa\""
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Creating Secrets based on SSH keys previous created"
   command: oc secrets new gitlab-ssh repoadmin-id-rsa=/tmp/repoadmin_id_rsa repoadmin-id-rsa-pub=/tmp/repoadmin_id_rsa.pub gitlab-shell-id-rsa=/tmp/gitlab_shell_id_rsa gitlab-shell-id-rsa-pub=/tmp/gitlab_shell_id_rsa.pub --namespace {{ rhmap_project_core }}
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Creating the Security Context Constraint for Monitoring Services"
   command: oc create --filename {{ rhmap_directory_rhmap }}/core/scc-anyuid-with-chroot.json --namespace {{ rhmap_project_core }}
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Specify the Security Context Constraint for project \"{{ rhmap_project_core }}\""
   command: oadm policy add-scc-to-user anyuid-with-chroot system:serviceaccount:{{ rhmap_project_core }}:default
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Creating Core InfraStructure"
   command: oc new-app --file {{ rhmap_directory_rhmap }}/core/fh-core-infra.json --namespace {{ rhmap_project_core }}
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Creating Backend" 
   command: oc new-app --file {{ rhmap_directory_rhmap }}/core/fh-core-backend.json --namespace {{ rhmap_project_core }}
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Get the GIT URL to feed into Frontend. It should be something like git-rhmap-core.cloudapps.example.com"
   command: "oc get route git --template=\"{{ '{{'  }}.spec.host{{ '}}' }}\" --namespace {{ rhmap_project_core }}"
   register: result_git
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Get only the subdomain. It should be something like cloudapps.example.com"
   set_fact: router_subdomain={{ result_git.stdout | regex_replace("^(.*?)\.", "") }} 
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Create Frontend" 
   command: oc new-app --file {{ rhmap_directory_rhmap }}/core/fh-core-frontend.json --param CLUSTER_DOMAIN={{ router_subdomain }} --param GIT_EXTERNAL_HOST={{ result_git.stdout }} --param SMTP_SERVER={{ rhmap_smtp_server }} --param SMTP_USERNAME={{ rhmap_smtp_username }} --param SMTP_PASSWORD={{ rhmap_smtp_password }} --param EMAIL_REPLYTO={{ rhmap_email_replyto }} --param SMTP_PORT={{ rhmap_smtp_port }} --param SMTP_AUTH={{ rhmap_smtp_auth }} --param SMTP_TLS={{ rhmap_smtp_tls }} --param BUILDER_ANDROID_SERVICE_HOST={{ rhmap_builder_android_service_host }} --param BUILDER_IPHONE_SERVICE_HOST={{ rhmap_builder_iphone_service_host }} --namespace {{ rhmap_project_core }}
   tags: 
-     - install_rhmap_core
-     - install_rhmap
+     - rhmap_core
+     - rhmap
 
 - name: "Get the FrontEnd URL"
   command: "oc get route rhmap --template \"https://{{ '{{' }}.spec.host{{ '}}'}}\" --namespace {{ rhmap_project_core }}"
   register: frontend_url
   tags:
-     - install_rhmap_core
+     - rhmap_core
      - info
-     - install_rhmap
+     - rhmap
 
 - name: "Get the FrontEnd's Username"
   command: "oc get dc/millicore --output jsonpath='{{ '{' }}.spec.template.spec.containers[*].env[?(@.name==\"FH_ADMIN_USER_NAME\")].value{{ '}' }}' --namespace {{ rhmap_project_core }}"
   register: frontend_username
   tags: 
-     - install_rhmap_core
+     - rhmap_core
      - info
-     - install_rhmap
+     - rhmap
 
 - name: "Get the FrontEnd's Password" 
   command: "oc get dc/millicore --output jsonpath='{{ '{' }}.spec.template.spec.containers[*].env[?(@.name==\"FH_ADMIN_USER_PASSWORD\")].value{{ '}' }}' --namespace {{ rhmap_project_core }}"
   register: frontend_password
   tags: 
-     - install_rhmap_core
+     - rhmap_core
      - info
-     - install_rhmap
+     - rhmap
 
 - debug: msg="FrontEnd{{ ":" }} {{ frontend_url.stdout }}  Username{{ ":" }} {{ frontend_username.stdout }}  Password{{ ":" }} {{ frontend_password.stdout }}"
   tags:
-     - install_rhmap_core
+     - rhmap_core
      - info
-     - install_rhmap
+     - rhmap

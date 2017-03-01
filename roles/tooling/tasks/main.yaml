@@ -18,9 +18,14 @@
      - tooling
 
 - name: Creating all the necessary applications based on a OpenShift's template
-  command: oc new-app --file=templates/tooling-template.yaml --param=JENKINS_PASSWORD={{ password }} --param=GOGS_USERNAME={{ username }} --param=GOGS_PASSWORD={{ password }} --param=CLOUDAPPS_DOMAIN={{ openshift_cloudapps_domain }} --param=CLOUDAPPS_NAMESPACE={{ tooling_namespace }} --param=GOGS_URL={{ gogs_url }} --param=MICROSERVICES_NAMESPACE={{ microservices_namespace }} --namespace {{ tooling_namespace }}
+  command: oc new-app --file=templates/tooling-template.yaml --param=GOGS_USERNAME={{ username }} --param=GOGS_PASSWORD={{ password }} --param=CLOUDAPPS_DOMAIN={{ openshift_cloudapps_domain }} --param=CLOUDAPPS_NAMESPACE={{ tooling_namespace }} --param=GOGS_URL={{ gogs_url }} --param=MICROSERVICES_NAMESPACE={{ microservices_namespace }} --namespace {{ tooling_namespace }}
   tags: 
      - tooling  
+
+- name: Creating Jenkins Pipeline
+  command: oc new-app --file=templates/tooling-pipeline-template.yaml --param=GOGS_USERNAME={{ username }} --param=CLOUDAPPS_NAMESPACE={{ tooling_namespace }} --param=GOGS_URL={{ gogs_url }} --param=MICROSERVICES_NAMESPACE={{ microservices_namespace }} --namespace {{ tooling_namespace }}
+  tags:
+     - tooling
 
 - name: Wait for Gogs to be ready{{ ":" }} {{ gogs_url }}
   uri: url="{{ gogs_url }}" status_code=200 
@@ -127,7 +132,7 @@
   tags:
      - tooling
      - toolingnexus
-         - toolingnexus6
+     - toolingnexus6
 
 - name: Wait for Nexus to be ready{{ ":" }} {{ nexus_url }}
   uri: url="{{ nexus_url }}" status_code=200 
@@ -145,55 +150,43 @@
      - tooling
 
 - name: Adding a Repository into Nexus {{ '#' }}1
-  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"  status_code=201
        body="<repository><data><id>RedHatTP</id><name>RedHatTP</name><provider>maven2</provider><providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole><format>maven2</format><repoType>proxy</repoType><exposed>true</exposed><writePolicy>READ_ONLY</writePolicy><browseable>true</browseable><indexable>true</indexable><notFoundCacheTTL>1440</notFoundCacheTTL><repoPolicy>RELEASE</repoPolicy><checksumPolicy>WARN</checksumPolicy><downloadRemoteIndexes>true</downloadRemoteIndexes><remoteStorage><remoteStorageUrl>http{{ ':' }}//maven.repository.redhat.com/techpreview/all</remoteStorageUrl></remoteStorage><fileTypeValidation>true</fileTypeValidation><artifactMaxAge>-1</artifactMaxAge><metadataMaxAge>1440</metadataMaxAge><itemMaxAge>1440</itemMaxAge><autoBlockActive>true</autoBlockActive></data></repository>"
-  register: nexus_response
-  failed_when: nexus_response.status != 201
   tags:
      - tooling
      - toolingnexus
 
 - name: Adding a Repository into Nexus {{ '#' }}2
-  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"     status_code=201
        body="<repository><data><id>RedHatEA</id><name>RedHatEA</name><provider>maven2</provider><providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole><format>maven2</format><repoType>proxy</repoType><exposed>true</exposed><writePolicy>READ_ONLY</writePolicy><browseable>true</browseable><indexable>true</indexable><notFoundCacheTTL>1440</notFoundCacheTTL><repoPolicy>RELEASE</repoPolicy><checksumPolicy>WARN</checksumPolicy><downloadRemoteIndexes>true</downloadRemoteIndexes><remoteStorage><remoteStorageUrl>https{{ ':' }}//maven.repository.redhat.com/earlyaccess/all/</remoteStorageUrl></remoteStorage><fileTypeValidation>true</fileTypeValidation><artifactMaxAge>-1</artifactMaxAge><metadataMaxAge>1440</metadataMaxAge><itemMaxAge>1440</itemMaxAge><autoBlockActive>true</autoBlockActive></data></repository>"
-  register: nexus_response
-  failed_when: nexus_response.status != 201    
   tags:
      - tooling 
-         - toolingnexus
+     - toolingnexus
 
 - name: Adding a Repository into Nexus {{ '#' }}3
-  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"     status_code=201
        body="<repository><data><id>RedHatGA</id><name>RedHatGA</name><provider>maven2</provider><providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole><format>maven2</format><repoType>proxy</repoType><exposed>true</exposed><writePolicy>READ_ONLY</writePolicy><browseable>true</browseable><indexable>true</indexable><notFoundCacheTTL>1440</notFoundCacheTTL><repoPolicy>RELEASE</repoPolicy><checksumPolicy>WARN</checksumPolicy><downloadRemoteIndexes>true</downloadRemoteIndexes><remoteStorage><remoteStorageUrl>https{{ ':' }}//maven.repository.redhat.com/ga/</remoteStorageUrl></remoteStorage><fileTypeValidation>true</fileTypeValidation><artifactMaxAge>-1</artifactMaxAge><metadataMaxAge>1440</metadataMaxAge><itemMaxAge>1440</itemMaxAge><autoBlockActive>true</autoBlockActive></data></repository>"
-  register: nexus_response
-  failed_when: nexus_response.status != 201
   tags:
      - tooling
      - toolingnexus
 
 - name: Adding a Repository into Nexus {{ '#' }}4
-  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"     status_code=201
        body="<repository><data><id>FuseSourceEA</id><name>FuseSourceEA</name><provider>maven2</provider><providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole><format>maven2</format><repoType>proxy</repoType><exposed>true</exposed><writePolicy>READ_ONLY</writePolicy><browseable>true</browseable><indexable>true</indexable><notFoundCacheTTL>1440</notFoundCacheTTL><repoPolicy>RELEASE</repoPolicy><checksumPolicy>WARN</checksumPolicy><downloadRemoteIndexes>true</downloadRemoteIndexes><remoteStorage><remoteStorageUrl>http{{ ':' }}//repo.fusesource.com/nexus/content/groups/ea</remoteStorageUrl></remoteStorage><fileTypeValidation>true</fileTypeValidation><artifactMaxAge>-1</artifactMaxAge><metadataMaxAge>1440</metadataMaxAge><itemMaxAge>1440</itemMaxAge><autoBlockActive>true</autoBlockActive></data></repository>"
-  register: nexus_response
-  failed_when: nexus_response.status != 201
   tags:
      - tooling
      - toolingnexus
 
 - name: Adding a Repository into Nexus {{ '#' }}5
-  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"      status_code=201
        body="<repository><data><id>FuseSourceReleases</id><name>FuseSourceReleases</name><provider>maven2</provider><providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole><format>maven2</format><repoType>proxy</repoType><exposed>true</exposed><writePolicy>READ_ONLY</writePolicy><browseable>true</browseable><indexable>true</indexable><notFoundCacheTTL>1440</notFoundCacheTTL><repoPolicy>RELEASE</repoPolicy><checksumPolicy>WARN</checksumPolicy><downloadRemoteIndexes>true</downloadRemoteIndexes><remoteStorage><remoteStorageUrl>http{{ ':' }}//repo.fusesource.com/nexus/content/repositories/releases/</remoteStorageUrl></remoteStorage><fileTypeValidation>true</fileTypeValidation><artifactMaxAge>-1</artifactMaxAge><metadataMaxAge>1440</metadataMaxAge><itemMaxAge>1440</itemMaxAge><autoBlockActive>true</autoBlockActive></data></repository>" -X POST --header "Content-Type{{ ':' }}application/xml"
-  register: nexus_response
-  failed_when: nexus_response.status != 201
   tags:
      - tooling
      - toolingnexus
 
 - name: Adding a Repo Groups into Nexus {{ '#' }}6
-  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repo_groups"
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repo_groups" status_code=201
        body="<repo-group><data><id>forum</id><name>forum</name><provider>maven2</provider><format>maven2</format><repoType>group</repoType><exposed>true</exposed><providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole><repositories><repo-group-member><id>central</id><name>Central</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/central</resourceURI></repo-group-member><repo-group-member><id>FuseSourceEA</id><name>FuseSourceEA</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/FuseSourceEA</resourceURI></repo-group-member><repo-group-member><id>FuseSourceReleases</id><name>FuseSourceReleases</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/FuseSourceReleases</resourceURI></repo-group-member><repo-group-member><id>public</id><name>PublicRepositories</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/public</resourceURI></repo-group-member><repo-group-member><id>RedHatEA</id><name>RedHatEA</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/RedHatEA</resourceURI></repo-group-member><repo-group-member><id>RedHatGA</id><name>RedHatGA</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/RedHatGA</resourceURI></repo-group-member><repo-group-member><id>RedHatTP</id><name>RedHatTP</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/RedHatTP</resourceURI></repo-group-member><repo-group-member><id>releases</id><name>Releases</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/releases</resourceURI></repo-group-member></repositories></data></repo-group>"
-  register: nexus_response
-  failed_when: nexus_response.status != 201
   tags:
      - tooling
      - toolingnexus

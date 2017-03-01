@@ -2,7 +2,7 @@
   debug: msg="Be sure the {{ item.name }} file{{ ':' }} templates/rhcs-bc/installs/{{ item.filename }} exists ? Available at {{ item.url }}"
   with_items: "{{ jboss_installers }}"
   tags:  
-     - bussiness_central
+     - business_central
  
 - name: Checking if JBoss Installers are avaible at templates/rhcs-bc/installs
   stat: path=templates/rhcs-bc/installs/{{ item.filename }}
@@ -10,26 +10,26 @@
   register: jboss_installer_file
   failed_when: jboss_installer_file.stat.exists == False
   tags:  
-     - bussiness_central
+     - business_central
 
 - name: Modifying all the installers so they have Running permissions
   file: path=templates/rhcs-bc/installs/{{ item.filename }} mode="u+x"
   with_items: "{{ jboss_installers }}"
   tags:  
-     - bussiness_central
+     - business_central
 
 - name: Fetch Gogs's Port Address
   command: oc get service/gogs --output jsonpath='{..spec.ports[?(@.name=="web")].port}' --namespace {{ tooling_namespace }}
   register: gogs_port
   failed_when: gogs_port.rc != 0
   tags:
-     - bussiness_central
+     - business_central
      - gogs
 
 - name: Define Gogs's
   set_fact: gogs_url="gogs.{{ tooling_namespace }}.svc.cluster.local{{ ':' }}{{ gogs_port.stdout }}"
   tags:
-     - bussiness_central
+     - business_central
      - gogs
 
 - name: Wait for Gogs to be ready{{ ":" }} {{ gogs_url }}
@@ -39,7 +39,7 @@
   retries: 60
   delay: 10
   tags: 
-    - bussiness_central
+    - business_central
     - gogs
 
 #### Creating the Project/Namespace 
@@ -47,7 +47,7 @@
   command: oc delete project {{ businesscentral_namespace }} 
   ignore_errors: True
   tags: 
-     - bussiness_central
+     - business_central
      - project_creation
 
 - name: Create a new project name {{ businesscentral_namespace }} for a user {{ username }}
@@ -57,25 +57,25 @@
   retries: 5
   delay: 15
   tags:
-     - bussiness_central
+     - business_central
      - project_creation
 
 - name: Adjust the Policies so Business Central doesn't have problems running on top of OpenShift
   command: oadm policy add-scc-to-user anyuid --namespace {{ businesscentral_namespace }} --serviceaccount=default
   tags:
-     - bussiness_central
+     - business_central
      - project_creation
 
 - name: Create a ImageStream based on JBoss Demo Central{{ ':' }} jbossdemocentral/developer
   command: oc new-build "jbossdemocentral/developer" --name=business-central --binary=true --namespace {{ businesscentral_namespace }}
   tags: 
-     - bussiness_central
+     - business_central
      - project_creation
 
 - name: Added some variables used for Docker Build 
   command: oc env buildconfig/business-central GOGS_URL="{{ gogs_url }}" GOGS_USERNAME="{{ username }}" GOGS_PASSWORD="{{ password }}" --namespace {{ businesscentral_namespace }}
   tags:
-     - bussiness_central
+     - business_central
      - project_creation
 
 - name: Import the newly Docker Image created to a ImageStream in the current Project
@@ -85,37 +85,37 @@
   retries: 5
   delay: 15
   tags:
-     - bussiness_central
+     - business_central
      - project_creation
 
 - name: Start building based on a content at "templates/rhcs-bc/"
   command: oc start-build business-central --from-dir=templates/rhcs-bc/ --follow=true --wait=true --namespace {{ businesscentral_namespace }}
   tags:
-     - bussiness_central
+     - business_central
      - project_creation
 
 - name: Create a new application based on this ImageStream{{ ':' }} business-central
   command: oc new-app business-central --namespace {{ businesscentral_namespace }}
   tags:
-     - bussiness_central
+     - business_central
      - project_creation
 
-- name: Expose the route as business-central.{{ openshift_domain_cloudapps }} 
-  command: oc expose service business-central --hostname=business-central.{{ openshift_domain_cloudapps }} --namespace {{ businesscentral_namespace }}
+- name: Expose the route as business-central.{{ openshift_cloudapps_domain }} 
+  command: oc expose service business-central --hostname=business-central.{{ openshift_cloudapps_domain }} --namespace {{ businesscentral_namespace }}
   tags:
-     - bussiness_central
+     - business_central
      - project_creation
 
 - name: Fetch Business Central Port Number
   command: oc get service/business-central --output jsonpath='{..spec.ports[?(@.name=="8080-tcp")].port}' --namespace {{ businesscentral_namespace }}
   register: business_central_port
   tags:
-     - bussiness_central
+     - business_central
 
 - name: Define Business Central's URL
   set_fact: business_central_address="http{{ ':' }}//business-central.{{ businesscentral_namespace }}.svc.cluster.local{{ ':' }}{{ business_central_port.stdout }}"
   tags:
-     - bussiness_central
+     - business_central
 
 - name: Waiting Business Central to be Up{{ ':' }} {{ business_central_address }}
   uri: url="{{ business_central_address }}" status_code=200
@@ -124,7 +124,7 @@
   retries: 60
   delay: 10
   tags:
-     - bussiness_central
+     - business_central
 
 - name: Waiting Business Central Application to be Up{{ ':' }} {{ business_central_address }}/business-central
   uri: url="{{ business_central_address }}/business-central" status_code=200
@@ -133,27 +133,30 @@
   retries: 60
   delay: 10
   tags:
-     - bussiness_central
+     - business_central
 
 - name: Wait Business Central to settle down a while
   pause: seconds=60
   tags:
-     - bussiness_central
+     - business_central
   
 - name: Setting Up Organization Unit at Business Central Name{{ ':' }} TechOffice. HardCoded username{{ ':' }} demo, password{{ ':' }}jbossbrms1!
   uri: method=POST body_format=json url={{ business_central_address }}/business-central/rest/organizationalunits/
+       status_code=202  HEADER_Content-type="application/json"
        user='demo' password='jbossbrms1!' force_basic_auth=yes return_content=yes 
        body="{\"name\"{{ ':' }}\"techoffice\",\"owner\"{{ ':' }}\"demo\",\"description\"{{ ':' }}null,\"repositories\"{{ ':' }}[]}"
-  register: business_central_response
-  failed_when: business_central_response.status != 202
   tags:
-     - bussiness_central
+     - business_central
+
+- name: Wait Business Central to settle down a while
+  pause: seconds=20
+  tags:
+     - business_central
 
 - name: Setting Up Repositories at Business Central Name{{ ':' }} TechOffice. HardCoded username{{ ':' }} demo, password{{ ':' }}jbossbrms1!
   uri: method=POST body_format=json url={{ business_central_address }}/business-central/rest/repositories/
+       status_code=202  HEADER_Content-type="application/json"
        user='demo' password='jbossbrms1!' force_basic_auth=yes return_content=yes                  
        body="{\"name\"{{ ':' }}\"brms\",\"description\"{{ ':' }}null,\"requestType\"{{ ':' }}\"new\",\"gitURL\"{{ ':' }}null,\"organizationalUnitName\"{{ ':' }}\"techoffice\"}"
-  register: business_central_response
-  failed_when: business_central_response.status != 202
   tags:
-     - bussiness_central
+     - business_central
