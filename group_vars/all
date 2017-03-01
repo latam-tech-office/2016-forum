@@ -69,3 +69,25 @@ ansible_tower_url: "https://tower.{{ ansibletower_namespace }}.svc.cluster.local
 ansibletower_license_file: license_b4451138a0004212ac8476cc275a08e9.txt
 ansibletower_username: admin
 ansibletower_password: password
+
+### TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING
+###   TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING 
+tooling_namespace: tooling
+
+### LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST 
+###   LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST LOCUST 
+locust_namespace: locust
+locust_docker_image: "hakobera/locust:latest"
+
+### BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL 
+###   BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL BUSINESS CENTRAL 
+businesscentral_namespace: business-central
+businesscentral_docker_image: openshift/business-central:latest
+jboss_installers:
+     - { name: "JBoss EAP 6.0 Installer", filename: "jboss-eap-6.4.0-installer.jar", url: "https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=37383" }
+     - { name: "JBoss EAP 6.4 Patch 7", filename: "jboss-eap-6.4.7-patch.zip", url: "https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43071" }
+     - { name: "JBoss BRMS 6.3.0 GA Installer", filename: "jboss-brms-6.3.0.GA-installer.jar", url: "https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631" }
+
+### MICROSERVICES MICROSERVICES MICROSERVICES MICROSERVICES MICROSERVICES MICROSERVICES MICROSERVICES
+###    MICROSERVICES MICROSERVICES MICROSERVICES MICROSERVICES MICROSERVICES MICROSERVICES MICROSERVICES  
+microservices_namespace: microservices

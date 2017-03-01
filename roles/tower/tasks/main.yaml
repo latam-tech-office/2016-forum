@@ -3,20 +3,20 @@
   register: ansibletower_license_exists
   tags:
      - testlicense
-         - install_ansible_tower
+     - tower
 
 - name: Does the Ansible Tower license exists ?
   fail: msg="Ansible Tower License file{{ ':' }} {{ ansibletower_license_file }} wasn't found" 
   when: ansibletower_license_exists.stat.exists == False
   tags:
      - testlicense
-         - install_ansible_tower
+     - tower
          
 - name: Login as admin within OpenShift Environment
   command: oc login --username=system:admin
   tags:
      - create
-         - install_ansible_tower
+     - tower
          
 - name: Delete any previously existing serviceaccounts
   command: oc delete serviceaccount/satower --namespace {{ ansibletower_namespace }}
@@ -24,7 +24,7 @@
   tags:
      - create
      - cleanup
-         - install_ansible_tower
+     - tower
          
 - name: Delete any previously existing namespaces 
   command: oc delete project {{ ansibletower_namespace }}
@@ -32,7 +32,7 @@
   tags: 
      - create
      - cleanup
-         - install_ansible_tower
+     - tower
          
 - name: Create a Project{{ ':' }} {{ ansibletower_namespace }} 
   command: oadm new-project {{ ansibletower_namespace }} --display-name="Ansible Tower{{ ':' }} LATAM Red Hat Forum 2016" --admin={{ username }}
@@ -42,62 +42,62 @@
   delay: 10
   tags: 
      - create
-         - install_ansible_tower
+     - tower
          
 - name: Create a Service Account to relax security permissions
   command: oc create serviceaccount satower --namespace {{ ansibletower_namespace }}
   tags: 
      - create
-         - install_ansible_tower
+     - tower
             
 - name: Allow this pod to run in a relax Security Context
   command: oadm policy add-scc-to-user anyuid --serviceaccount satower --namespace {{ ansibletower_namespace }}
   tags: 
      - create
-         - install_ansible_tower
+     - tower
          
 - name: Allow this pod to run in a Privileged Security Context
   command: oadm policy add-scc-to-user privileged system:serviceaccount:{{ ansibletower_namespace }}:satower
   tags: 
      - create
-         - install_ansible_tower
+     - tower
          
 - name: Create the application based on a Docker Image {{ ansibletower_dockerimage }}
   command: oc new-app --name=tower --docker-image={{ ansibletower_dockerimage }} --namespace {{ ansibletower_namespace }}
   tags: 
      - create
-         - install_ansible_tower
+     - tower
          
 - name: Create the service for this container on port 443 (In case of Robert's Docker Image)
   command: oc expose deploymentconfig/tower --port=443 --namespace {{ ansibletower_namespace }}
   ignore_errors: Yes
   tags: 
      - create
-         - install_ansible_tower
+     - tower
          
 - name: Patch the DeploymentConfig to allow Privileged Containers
   command: oc patch deploymentconfig/tower --patch '{"spec"{{ ':' }}{"template"{{ ':' }}{"spec"{{ ':' }} {"containers"{{ ':' }} [{"name"{{ ':' }}"tower","securityContext"{{ ':' }} {"privileged"{{ ':' }} true}} ],"serviceAccountName"{{ ':' }}"satower"}}}}' --namespace {{ ansibletower_namespace }}
   tags: 
      - create
-         - install_ansible_tower
+     - tower
          
 - name: Patch the DeploymentConfig to avoid always download the image
   command: oc patch deploymentconfig/tower --patch '{"spec"{{ ':' }}{"template"{{ ':' }}{"spec"{{ ':' }} {"containers"{{ ':' }} [{"name"{{ ':' }}"tower", "imagePullPolicy"{{ ':' }}"IfNotPresent"}]}}}}' --namespace {{ ansibletower_namespace }}
   tags: 
      - create
-         - install_ansible_tower
+     - tower
          
-- name: Create a friendly route tower.{{ openshift_domain_cloudapps }}
-  command: oc expose service/tower --hostname=tower.{{ openshift_domain_cloudapps }} --namespace {{ ansibletower_namespace }}
+- name: Create a friendly route tower.{{ openshift_cloudapps_domain }}
+  command: oc expose service/tower --hostname=tower.{{ openshift_cloudapps_domain }} --namespace {{ ansibletower_namespace }}
   tags: 
      - create
-         - install_ansible_tower
+     - tower
          
 - name: Create a Patch to Router, so it allowed TLS Passthrough
   command: oc patch route/tower --patch='{"spec"{{ ':' }}{"tls"{{ ':' }}{"termination"{{ ':' }} "passthrough"}}}' --namespace {{ ansibletower_namespace }}
   tags: 
      - create
-         - install_ansible_tower
+     - tower
          
 - name: Fetch Ansible Tower port
   command: oc get service/tower --output jsonpath='{..spec.ports[?(@.name=="443-tcp")].port}' --namespace {{ ansibletower_namespace }}
@@ -105,12 +105,12 @@
   when: '{{ "rcalvaga" not in ansibletower_dockerimage }}'
   failed_when: ansible_tower_port.rc != 0
   tags:
-         - install_ansible_tower
+     - tower
          
 - set_fact: tower_port={{ ansible_tower_port.stdout }}
   when: '{{ "rcalvaga" not in ansibletower_dockerimage }}'
   tags:
-         - install_ansible_tower
+     - tower
          
 - name: Fetch Ansible Tower port (Robert's Docker Image)
   command: oc get service/tower --output jsonpath='{..spec.ports.*.port}' --namespace {{ ansibletower_namespace }}
@@ -118,17 +118,17 @@
   when: '{{ "rcalvaga" in ansibletower_dockerimage }}'
   failed_when: ansible_tower_port.rc != 0
   tags:
-         - install_ansible_tower
+     - tower
          
 - set_fact: tower_port={{ ansible_tower_port.stdout }}
   when: '{{ "rcalvaga" in ansibletower_dockerimage }}'
   tags:
-         - install_ansible_tower
+     - tower
          
 - name: Define Ansible Tower URL
   set_fact: ansible_tower_url='https://tower.{{ ansibletower_namespace }}.svc.cluster.local:{{ tower_port }}'
   tags: 
-         - install_ansible_tower
+     - tower
          
 - name: Wait for Ansible Tower to be up{{ ':' }} {{ ansible_tower_url }}
   uri: url="{{ ansible_tower_url }}" validate_certs=no status_code=200 
@@ -137,27 +137,27 @@
   retries: 60
   delay: 10
   tags: 
-         - install_ansible_tower
+     - tower
          
 - set_fact: license_content={{ lookup('file', '{{ ansibletower_license_file }}') }}
   tags:
-         - install_ansible_tower
+     - tower
          
 - name: Adding a EULA into the License file
   lineinfile: dest=./{{ ansibletower_license_file }} regexp="{" line="{\n    \"eula_accepted\"{{ ':' }} true,"
   when: '{{ "eula_accepted" not in license_content }}'
   tags: 
-         - install_ansible_tower
+     - tower
 
 - name: Apply the license file into Ansible Tower
   uri: method=POST body_format=json url="{{ ansible_tower_url }}/api/v1/config/"   status_code=200
-  HEADER_Content-type="application/json" HEADER_Accept="application/json"
-  user={{ ansibletower_username }} password={{ ansibletower_password }} force_basic_auth=yes validate_certs=no return_content=yes
-  body="{{ lookup('file', '{{ ansibletower_license_file }}') }}"
+       HEADER_Content-type="application/json" HEADER_Accept="application/json"
+       user={{ ansibletower_username }} password={{ ansibletower_password }} force_basic_auth=yes validate_certs=no return_content=yes
+       body="{{ lookup('file', '{{ ansibletower_license_file }}') }}"
   tags: 
-         - install_ansible_tower
+     - tower
 
-- name: Adding forumuser to Ansible Tower
+- name: Adding {{ username }} to Ansible Tower
   uri:  
     method: POST  
     status_code: 201  
@@ -170,9 +170,9 @@
     force_basic_auth: yes 
     validate_certs: no 
     return_content: yes
-    body: '{"username": "forumuser","first_name": "Forum","last_name": "User","email": "forumuser@{{ openshift_domain }}","is_superuser": false,"is_system_auditor": false,"password": "{{ password }}"}'
+    body: '{"username": "{{ username }}","first_name": "Demo","last_name": "Demo","email": "demo@{{ openshift_domain }}","is_superuser": false,"is_system_auditor": false,"password": "{{ password }}"}'
   tags: 
-         - install_ansible_tower
+     - tower
      - configtower
      - createuserstower
 
@@ -190,28 +190,28 @@
     body: '{"username": "forumadmin","first_name": "Forum","last_name": "Admin","email": "forumadmin@{{ openshift_domain }}","is_superuser": true,"is_system_auditor": false,"password": "{{ password }}"}'
     status_code: 201
   tags:
-         - install_ansible_tower
+     - tower
      - configtower
      - createuserstower
  
     
-- name: Adding "{{ username }}" to Ansible Tower
-  uri:
-    method: POST
-    body_format: json
-    HEADER_Content-Type: application/json
-    validate_certs: no
-    return_content: yes
-    url: "{{ ansible_tower_url }}/api/v1/users/"
-    user: "{{ ansibletower_username }}"
-    password: "{{ ansibletower_password }}"
-    force_basic_auth: yes
-    body: '{"username": "{{ username }}","first_name": "Demo","last_name": "User","email": "{{ username }}@{{ openshift_domain }}","is_superuser": true,"is_system_auditor": false,"password": "{{ password }}"}'
-    status_code: 201
-  tags:
-         - install_ansible_tower
-     - configtower
-     - createuserstower
+#- name: Adding "{{ username }}" to Ansible Tower
+#  uri:
+#    method: POST
+#    body_format: json
+#    HEADER_Content-Type: application/json
+#    validate_certs: no
+#    return_content: yes
+#    url: "{{ ansible_tower_url }}/api/v1/users/"
+#    user: "{{ ansibletower_username }}"
+#    password: "{{ ansibletower_password }}"
+#    force_basic_auth: yes
+#    body: '{"username": "{{ username }}","first_name": "Demo","last_name": "User","email": "{{ username }}@{{ openshift_domain }}","is_superuser": true,"is_system_auditor": false,"password": "{{ password }}"}'
+#    status_code: 201
+#  tags:
+#     - tower
+#     - configtower
+#     - createuserstower
 
 - name: Adding forumauditor to Ansible Tower
   uri:
@@ -227,7 +227,7 @@
     status_code: 201
     body: '{"username": "forumauditor","first_name": "Forum","last_name": "Auditor","email": "forumauditor@{{ openshift_domain }}","is_superuser": false,"is_system_auditor": true,"password": "{{ password }}"}'
   tags:
-         - install_ansible_tower
+     - tower
      - configtower
      - createuserstower
 
@@ -245,7 +245,7 @@
     body: '{"name": "OpenShift Enterprise 3 Project","description": "Project for Automating OpenShift Enterprise 3","local_path": "","scm_type": "git","scm_url": "https://github.com/rcalvaga/ansible-rh-forum-latam","scm_branch": "","scm_clean": true,"scm_delete_on_update": true,"credential": null,"organization": 1,"scm_update_on_launch": true,"scm_update_cache_timeout": 0}'
     status_code: 201
   tags:
-         - install_ansible_tower
+     - tower
      - configtower
      - createprojectstower
  
@@ -263,7 +263,7 @@
     body: '{"name": "LATAM Red Hat Forum Team","description": "LATAM Red Hat Forum Team","organization": 1}'
     status_code: 201
   tags:
-         - install_ansible_tower
+     - tower
      - configtower
      - createteamstower
  
@@ -278,10 +278,10 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "OpenShift Credentials","description": "OpenShift Credentials","kind": "ssh","host": "","username": "{{ openshift_master_username }}","password": "{{ openshift_master_password }}","security_token": "","project": "37","domain": "","ssh_key_data": "","ssh_key_unlock": "","organization": 1,"become_method": "","become_ansibletower_username": "","become_password": "","vault_password": "","subscription": "","tenant": "","secret": "","client": "","authorize": false,"authorize_password": "","user": null,"team": 1}'
+    body: '{"name": "OpenShift Credentials","description": "OpenShift Credentials","kind": "ssh","host": "","username": "{{ username }}","password": "{{ password }}","security_token": "","project": "37","domain": "","ssh_key_data": "","ssh_key_unlock": "","organization": 1,"become_method": "","become_ansibletower_username": "","become_password": "","vault_password": "","subscription": "","tenant": "","secret": "","client": "","authorize": false,"authorize_password": "","user": null,"team": 1}'
     status_code: 201
   tags:
-     - install_ansible_tower
+     - tower
      - configtower
      - createcredentialstower
  
@@ -299,7 +299,7 @@
     body: '{"name": "OpenShift Inventory","description": "OpenShift Inventory","organization": 1,"variables": "---"}'
     status_code: 201
   tags:
-     - install_ansible_tower
+     - tower
      - configtower
      - createinventoriestower
   
@@ -317,7 +317,7 @@
     body: '{"name": "master-group","description": "Master group of OpenShift","inventory": 34,"variables": ""}'
     status_code: 201
   tags:
-     - install_ansible_tower
+     - tower
      - configtower
      - creategroupstower
  
@@ -335,7 +335,7 @@
     body: '{"name": "nodes-group","description": "Nodes group of OpenShift","inventory": 34,"variables": ""}'
     status_code: 201
   tags:
-     - install_ansible_tower
+     - tower
      - configtower
      - creategroupstower
   
@@ -353,7 +353,7 @@
     body: '{"name": "openshift.default.svc.cluster.local","description": "Master Server of OpenShift","inventory": 34,"enabled": true,"instance_id": "","variables": ""}'
     status_code: 201
   tags:
-     - install_ansible_tower
+     - tower
      - configtower
      - createhoststower
  
@@ -375,11 +375,11 @@
   retries: 10
   delay: 10
   tags:
-     - install_ansible_tower
+     - tower
      - configtower
      - createjobtemplatestower
 
-- name: Creating "Create RH Forum 2016 Apps in OpenShift 3" Job Template within Ansible Tower
+- name: Creating "Create LATAM Red Hat Forum 2016 Apps in OpenShift 3" Job Template within Ansible Tower
   uri:
     method: POST
     body_format: json
@@ -390,19 +390,19 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Create RH Forum 2016 Apps in OpenShift 3","description": "Create RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-create-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "openshift.default.svc.cluster.local","verbosity": 1,"extra_vars": "---\nproject_name:\ndemo_environment:\ndemo_user:\napp_template:\ntooling_user:\ncicd_user:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Create LATAM Red Hat Forum 2016 Apps in OpenShift 3","description": "Create RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-create-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "openshift.default.svc.cluster.local","verbosity": 1,"extra_vars": "---\nproject_name:\ndemo_environment:\ndemo_user:\napp_template:\ntooling_user:\ncicd_user:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
   retries: 10
   delay: 10
   tags:
-     - install_ansible_tower
+     - tower
      - configtower
      - createjobtemplatestower
     
 
-- name: Creating "Delete RH Forum 2016 Apps in OpenShift 3" Job Template within Ansible Tower
+- name: Creating "Delete LATAM Red Hat Forum 2016 Apps in OpenShift 3" Job Template within Ansible Tower
   uri:
     method: POST
     body_format: json
@@ -413,14 +413,14 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Delete RH Forum 2016 Apps in OpenShift 3","description": "Delete RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-delete-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "openshift.default.svc.cluster.local","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Delete LATAM Red Hat Forum 2016 Apps in OpenShift 3","description": "Delete RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-delete-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "openshift.default.svc.cluster.local","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
   retries: 10
   delay: 10
   tags:
-     - install_ansible_tower
+     - tower
      - configtower
      - createjobtemplatestower
     
@@ -443,6 +443,6 @@
   retries: 10
   delay: 10
   tags:
-     - install_ansible_tower
+     - tower
      - configtower
      - createjobtemplatestower

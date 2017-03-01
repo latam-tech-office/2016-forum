@@ -4,7 +4,7 @@
   tags: 
      - create
      - cleanup
-     - install_cloudforms
+     - cloudforms
 
 - name: Create a Project{{ ':' }} {{ cloudforms_namespace }} 
   command: oadm new-project {{ cloudforms_namespace }} --display-name="CloudForms{{ ':' }} LATAM Red Hat Forum 2016" --admin={{ username }}
@@ -15,78 +15,78 @@
   tags: 
      - create
      - cleanup
-     - install_cloudforms
+     - cloudforms
 
 - name: Allow this pod to run in a Privileged Security Context
   command: oadm policy add-scc-to-user privileged system:serviceaccount:{{ cloudforms_namespace }}:default
   tags: 
      - create
      - cleanup
-     - install_cloudforms
+     - cloudforms
 
 - name: Create the application based on a template
   command: oc new-app --file=templates/cfme-template.yaml --param=NAME=cloudforms --namespace {{ cloudforms_namespace }}
   tags: 
      - create
      - cleanup
-     - install_cloudforms
+     - cloudforms
 
 #- name: Remove the persistence volume from postgresql. It will be add that later.
 #  command: oc volume deploymentconfig/postgresql --name=cfme-pgdb-volume --remove --namespace {{ cloudforms_namespace }}
 #  tags: 
 #     - create
 #     - remove_persistence
-#     - install_cloudforms                 
+#     - cloudforms                 
 
 #- name: Remove the persistence volume from cloudforms. It will be add that later.
 #  command: oc volume deploymentconfig/cloudforms --name=cfme-app-volume --remove --namespace {{ cloudforms_namespace }}
 #  tags:
 #     - create
 #     - remove_persistence
-#     - install_cloudforms                 
+#     - cloudforms                 
 
 - name: Remove current router
   command: oc delete route/cloudforms --namespace {{ cloudforms_namespace }}
   tags:
      - create
      - recreate_router
-     - install_cloudforms                 
+     - cloudforms                 
 
 - name: Create a friendly route cloudforms.{{ openshift_cloudapps_domain }}
   command: oc expose service/cloudforms --hostname=cloudforms.{{ openshift_cloudapps_domain }} --port={{ cloudforms_http_type }} --namespace {{ cloudforms_namespace }}
   tags:
      - create
      - recreate_router
-     - install_cloudforms                 
+     - cloudforms                 
 
 - name: Specify a Router Termination due SSL{{ ':' }} Passthrough
   command: oc patch route/cloudforms --patch='{"spec"{{ ':' }}{"tls"{{ ':' }}{"termination"{{ ':' }} "passthrough"}}}' --namespace {{ cloudforms_namespace }}
   tags:
      - create
      - recreate_router 
-     - install_cloudforms                 
+     - cloudforms                 
 
 - name: Fetch CloudForms Port
   command: oc get service/cloudforms --output jsonpath='{..spec.ports[?(@.name=="{{ cloudforms_http_type }}")].port}' --namespace {{ cloudforms_namespace }}
   register: cloudforms_port
   tags: 
-     - install_cloudforms                 
+     - cloudforms                 
 
 - name: Fetch CloudForms Address
   command: oc get service/cloudforms --output jsonpath='{..spec.clusterIP}' --namespace {{ cloudforms_namespace }}
   register: cloudforms_ip
   tags: 
-     - install_cloudforms                 
+     - cloudforms                 
 
 - name: Define CloudForms URL
   set_fact: cloudforms_url='cloudforms.{{ cloudforms_namespace }}.svc.cluster.local:{{ cloudforms_port.stdout }}'
   tags: 
-         - install_cloudforms
+         - cloudforms
                   
 - name: Define CloudForms FULL URL
   set_fact: cloudforms_full_url='{{ cloudforms_http_type }}{{ ':' }}//{{ cloudforms_url }}'
   tags:
-     - install_cloudforms
+     - cloudforms
                   
 - name: Wait for CloudForms to be up{{ ':' }} {{ cloudforms_full_url }}
   uri: url='{{ cloudforms_full_url }}' validate_certs=no status_code=200 
@@ -95,13 +95,13 @@
   retries: 60
   delay: 10
   tags: 
-     - install_cloudforms             
+     - cloudforms             
 
 - name: Fetch a Token from Management Infrastructure
   command: oc serviceaccounts get-token management-admin --namespace management-infra
   register: management_infra_token
   tags: 
-     - install_cloudforms                 
+     - cloudforms                 
     
 - name: Adding {{ username }} user to CloudForms
   uri:
@@ -119,7 +119,7 @@
   tags:
      - configcloudforms
      - createuserscloudforms
-         - install_cloudforms                   
+         - cloudforms                   
   
 - name: Adding Red Hat Forum LATAM 2016 Tenant to CloudForms
   uri:
@@ -137,7 +137,7 @@
   tags:
      - configcloudforms
      - createtenantscloudforms  
-     - install_cloudforms                        
+     - cloudforms                        
   
 - name: Adding OpenShift Container Platform Provider to CloudForms
   uri:
@@ -155,7 +155,7 @@
   tags:
      - configcloudforms
      - createproviderscloudforms 
-     - install_cloudforms                       
+     - cloudforms                       
   
 - name: Adding Ansible Tower Provider to CloudForms
   uri:
@@ -169,8 +169,9 @@
     password: "{{ cloudforms_password }}"
     force_basic_auth: yes
     status_code: 200
-    body: '{"type":"ManageIQ::Providers::AnsibleTower::Provider","tenant_id":1000000000002,"name":"Ansible Tower 3","url":"https://tower.ansible-tower.svc.cluster.local","credentials": {"userid":"admin","password":"password"}}'
+    body: '{"type":"ManageIQ::Providers::AnsibleTower::Provider","tenant_id":1000000000002,"name":"Ansible Tower 3","url":"https://tower.{{ ansibletower_namespace }}.svc.cluster.local","credentials": {"userid":"{{ ansible_username }}","password":"{{ ansible_password }}"}}'
+  ignore_errors: True
   tags:
      - configcloudforms
      - createproviderscloudforms
-     - install_cloudforms
+     - cloudforms

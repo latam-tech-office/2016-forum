@@ -1,0 +1,39 @@
+- name: Delete any existing namespaces
+  command: oc delete project {{ locust_namespace }}
+  ignore_errors: True
+  tags:
+     - locust
+
+- name: Creating the Project{{ ':' }} {{ locust_namespace }}
+  command: oadm new-project {{ locust_namespace }} --display-name="Locust{{ ":" }} LATAM Red Hat Forum 2016" --admin={{ username }}
+  register: create_namespace
+  until: create_namespace.rc == 0
+  retries: 10
+  delay: 10
+  tags:
+     - locust
+
+- name: Put this project in a Relax Security Context
+  command: oadm policy add-scc-to-user anyuid --namespace {{ locust_namespace }} --serviceaccount default
+  tags:
+     - locust
+
+- name: Create a New Build based on image{{ ':' }} {{ locust_docker_image }}
+  command: oc new-build {{ locust_docker_image }} --name=locust --binary=true --namespace {{ locust_namespace }} --to locust
+  tags:
+     - locust
+
+- name: Start a New Build based on a Dockerfile{{ ':' }}} templates/locust
+  command: oc start-build locust --from-dir=templates/locust --follow=true --wait=true --namespace {{ locust_namespace }}
+  tags:
+     - locust
+
+- name: Create a New Application based on a Image built
+  command: oc new-app locust --namespace {{ locust_namespace }}
+  tags:
+     - locust
+
+- name: Expose a Route{{ ':' }} locust.{{ openshift_cloudapps_domain }}
+  command: oc expose service/locust --hostname=locust.{{ openshift_cloudapps_domain }} --namespace {{ locust_namespace }} --port 8089
+  tags:
+     - locust

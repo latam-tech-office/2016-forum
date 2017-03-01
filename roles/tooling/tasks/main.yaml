@@ -1,0 +1,199 @@
+- name: Delete any existing namespaces 
+  command: oc delete project {{ tooling_namespace }} 
+  ignore_errors: True
+  tags:
+     - tooling
+
+- name: Creating the Project{{ ':' }} {{ tooling_namespace }} 
+  command: oadm new-project {{ tooling_namespace }} --display-name="Tooling{{ ":" }} LATAM Red Hat Forum 2016" --admin={{ username }} 
+  register: create_namespace
+  until: create_namespace.rc == 0
+  retries: 10
+  delay: 10
+  tags:
+     - tooling  
+
+- set_fact: gogs_url="http{{ ':' }}//gogs.{{ tooling_namespace }}.svc.cluster.local:3000"
+  tags:
+     - tooling
+
+- name: Creating all the necessary applications based on a OpenShift's template
+  command: oc new-app --file=templates/tooling-template.yaml --param=JENKINS_PASSWORD={{ password }} --param=GOGS_USERNAME={{ username }} --param=GOGS_PASSWORD={{ password }} --param=CLOUDAPPS_DOMAIN={{ openshift_cloudapps_domain }} --param=CLOUDAPPS_NAMESPACE={{ tooling_namespace }} --param=GOGS_URL={{ gogs_url }} --param=MICROSERVICES_NAMESPACE={{ microservices_namespace }} --namespace {{ tooling_namespace }}
+  tags: 
+     - tooling  
+
+- name: Wait for Gogs to be ready{{ ":" }} {{ gogs_url }}
+  uri: url="{{ gogs_url }}" status_code=200 
+  register: gogs_wait
+  until: gogs_wait.status == 200
+  retries: 60
+  delay: 10
+  tags: 
+     - tooling  
+
+- name: Wait Gogs settles down a while
+  pause: seconds=60
+  tags: 
+     - tooling
+         
+- name: Retrieving Gogs Database's Username
+  command: oc get deploymentconfig/postgresql-gogs -o jsonpath="{.spec.template.spec.containers[*].env[?(@.name==\"POSTGRESQL_USER\")].value}" --namespace {{ tooling_namespace }}
+  register: gogs_database_username
+  tags: 
+     - tooling
+         
+- name: Retrieving Gogs Database's Password
+  command: oc get deploymentconfig/postgresql-gogs -o jsonpath="{.spec.template.spec.containers[*].env[?(@.name==\"POSTGRESQL_PASSWORD\")].value}" --namespace {{ tooling_namespace }}
+  register: gogs_database_password
+  tags: 
+     - tooling
+         
+- name: Retrieving Gogs Database's Name
+  command: oc get deploymentconfig/postgresql-gogs -o jsonpath="{.spec.template.spec.containers[*].env[?(@.name==\"POSTGRESQL_DATABASE\")].value}" --namespace {{ tooling_namespace }}
+  register: gogs_database_name
+  tags: 
+     - tooling  
+
+- name: Retrieving Gogss Database's IP
+  command: oc get service/postgresql-gogs --output template --template "{{ '{{' }}.spec.clusterIP{{ '}}' }}" --namespace {{ tooling_namespace }}
+  register: gogs_database_ip
+  tags: 
+     - tooling
+         
+- name: Retrieving Gog's Port Number
+  command: oc get service/postgresql-gogs --output jsonpath="{.spec.ports.*.port}" --namespace {{ tooling_namespace }}
+  register: gogs_database_port
+  tags: 
+     - tooling
+
+- name: Define Gogs's Address to use during installation
+  set_fact: gogs_address="http{{ ':' }}//gogs.{{ openshift_cloudapps_domain }}/"
+  tags: 
+     - tooling
+ 
+- name: Installing Gogs for the very first time
+  uri: method=POST HEADER_Content-type="application/x-www-form-urlencoded" url="{{ gogs_url }}/install"
+       body="db_type={{ "PostgreSQL" | urlencode }}&db_host={{ gogs_database_ip.stdout | urlencode }}%3A{{ gogs_database_port.stdout }}&db_user={{ gogs_database_username.stdout }}&db_passwd={{ gogs_database_password.stdout }}&db_name={{ gogs_database_name.stdout | urlencode }}&ssl_mode=disable&db_path=data%2Fgogs.db&app_name={{ "Gogs Go Git Service" | urlencode }}&repo_root_path={{ "/home/gogs/gogs-repositories" | urlencode }}&run_user=gogs&domain=localhost&ssh_port=22&http_port=3000&app_url={{ gogs_address | urlencode }}&log_root_path=%2Fopt%2Fgogs%2Flog&admin_name={{ username | urlencode }}&admin_passwd={{ password | urlencode }}&admin_confirm_passwd={{ password | urlencode }}&admin_email={{ "admin@gogs.com" | urlencode }}"
+  register: result_install
+  failed_when: result_install.status != 302
+  tags: 
+     - tooling
+
+- name: Import into BRMS Content
+  uri: method=POST body_format=json url={{ gogs_url }}/api/v1/repos/migrate
+       user={{ username }} password={{ password }} force_basic_auth=yes
+       body="{\"clone_addr\"{{ ":" }}\"https{{ ":" }}//github.com/pstlatam/rhforum2016brms.git\",\"uid\"{{ ":" }} 1,\"repo_name\"{{ ":" }} \"brms\"}"
+  register: json_result
+  failed_when: 
+         - json_result.status != 201
+         - json_result.status != 504
+  tags: 
+     - tooling
+     - installbrms
+
+- name: Import into Forum Content
+  uri: method=POST body_format=json url={{ gogs_url }}/api/v1/repos/migrate
+       user={{ username }} password={{ password }} force_basic_auth=yes
+       body="{\"clone_addr\"{{ ":" }}\"https{{ ":" }}//github.com/pstlatam/rhforum2016.git\",\"uid\"{{ ":" }} 1,\"repo_name\"{{ ":" }} \"forum\"}"
+  register: json_result
+  failed_when: 
+         - json_result.status != 201
+         - json_result.status != 504
+  tags: 
+     - tooling
+     - installforum
+
+- name: Add a WebHook to Jenkins
+  uri: method=POST body_format=json url="{{ gogs_url }}/api/v1/repos/{{ username }}/brms/hooks"
+       user={{ username }} password={{ password }} force_basic_auth=yes
+       body="{\"type\"{{ ":" }}\"gogs\",\"config\"{{ ":" }}{\"url\"{{ ":" }}\"http://admin:{{ password }}@jenkins:80/job/forum-pipeline/build?delay=0sec\",\"content_type\"{{ ":" }}\"json\"},\"events\"{{ ":" }}[\"push\"],\"active\"{{ ":" }}true}"
+  register: json_result
+  failed_when: json_result.status != 201
+  tags: 
+     - tooling
+     - installwebhook
+
+- name: Fetch Nexus Port
+  command: oc get service/nexus --output jsonpath='{..spec.ports[?(@.name=="web")].port}' --namespace {{ tooling_namespace }}
+  register: nexus_port
+  failed_when: nexus_port.rc != 0
+  tags:
+     - tooling
+     - toolingnexus
+     - toolingnexus6
+
+- name: Define the address to reach Nexus. Hardcoded Username{{ ':' }}admin, Password{{ ':' }}admin123
+  set_fact: nexus_url="http{{ ':' }}//admin:admin123@nexus.{{ tooling_namespace }}.svc.cluster.local{{ ':' }}{{ nexus_port.stdout }}"
+  tags:
+     - tooling
+     - toolingnexus
+         - toolingnexus6
+
+- name: Wait for Nexus to be ready{{ ":" }} {{ nexus_url }}
+  uri: url="{{ nexus_url }}" status_code=200 
+  register: nexus_wait
+  until: nexus_wait.status == 200
+  retries: 60
+  delay: 10
+  tags:
+     - tooling
+     - toolingnexus
+
+- name: Wait Nexus settles down a while
+  pause: seconds=60
+  tags: 
+     - tooling
+
+- name: Adding a Repository into Nexus {{ '#' }}1
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"
+       body="<repository><data><id>RedHatTP</id><name>RedHatTP</name><provider>maven2</provider><providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole><format>maven2</format><repoType>proxy</repoType><exposed>true</exposed><writePolicy>READ_ONLY</writePolicy><browseable>true</browseable><indexable>true</indexable><notFoundCacheTTL>1440</notFoundCacheTTL><repoPolicy>RELEASE</repoPolicy><checksumPolicy>WARN</checksumPolicy><downloadRemoteIndexes>true</downloadRemoteIndexes><remoteStorage><remoteStorageUrl>http{{ ':' }}//maven.repository.redhat.com/techpreview/all</remoteStorageUrl></remoteStorage><fileTypeValidation>true</fileTypeValidation><artifactMaxAge>-1</artifactMaxAge><metadataMaxAge>1440</metadataMaxAge><itemMaxAge>1440</itemMaxAge><autoBlockActive>true</autoBlockActive></data></repository>"
+  register: nexus_response
+  failed_when: nexus_response.status != 201
+  tags:
+     - tooling
+     - toolingnexus
+
+- name: Adding a Repository into Nexus {{ '#' }}2
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"
+       body="<repository><data><id>RedHatEA</id><name>RedHatEA</name><provider>maven2</provider><providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole><format>maven2</format><repoType>proxy</repoType><exposed>true</exposed><writePolicy>READ_ONLY</writePolicy><browseable>true</browseable><indexable>true</indexable><notFoundCacheTTL>1440</notFoundCacheTTL><repoPolicy>RELEASE</repoPolicy><checksumPolicy>WARN</checksumPolicy><downloadRemoteIndexes>true</downloadRemoteIndexes><remoteStorage><remoteStorageUrl>https{{ ':' }}//maven.repository.redhat.com/earlyaccess/all/</remoteStorageUrl></remoteStorage><fileTypeValidation>true</fileTypeValidation><artifactMaxAge>-1</artifactMaxAge><metadataMaxAge>1440</metadataMaxAge><itemMaxAge>1440</itemMaxAge><autoBlockActive>true</autoBlockActive></data></repository>"
+  register: nexus_response
+  failed_when: nexus_response.status != 201    
+  tags:
+     - tooling 
+         - toolingnexus
+
+- name: Adding a Repository into Nexus {{ '#' }}3
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"
+       body="<repository><data><id>RedHatGA</id><name>RedHatGA</name><provider>maven2</provider><providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole><format>maven2</format><repoType>proxy</repoType><exposed>true</exposed><writePolicy>READ_ONLY</writePolicy><browseable>true</browseable><indexable>true</indexable><notFoundCacheTTL>1440</notFoundCacheTTL><repoPolicy>RELEASE</repoPolicy><checksumPolicy>WARN</checksumPolicy><downloadRemoteIndexes>true</downloadRemoteIndexes><remoteStorage><remoteStorageUrl>https{{ ':' }}//maven.repository.redhat.com/ga/</remoteStorageUrl></remoteStorage><fileTypeValidation>true</fileTypeValidation><artifactMaxAge>-1</artifactMaxAge><metadataMaxAge>1440</metadataMaxAge><itemMaxAge>1440</itemMaxAge><autoBlockActive>true</autoBlockActive></data></repository>"
+  register: nexus_response
+  failed_when: nexus_response.status != 201
+  tags:
+     - tooling
+     - toolingnexus
+
+- name: Adding a Repository into Nexus {{ '#' }}4
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"
+       body="<repository><data><id>FuseSourceEA</id><name>FuseSourceEA</name><provider>maven2</provider><providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole><format>maven2</format><repoType>proxy</repoType><exposed>true</exposed><writePolicy>READ_ONLY</writePolicy><browseable>true</browseable><indexable>true</indexable><notFoundCacheTTL>1440</notFoundCacheTTL><repoPolicy>RELEASE</repoPolicy><checksumPolicy>WARN</checksumPolicy><downloadRemoteIndexes>true</downloadRemoteIndexes><remoteStorage><remoteStorageUrl>http{{ ':' }}//repo.fusesource.com/nexus/content/groups/ea</remoteStorageUrl></remoteStorage><fileTypeValidation>true</fileTypeValidation><artifactMaxAge>-1</artifactMaxAge><metadataMaxAge>1440</metadataMaxAge><itemMaxAge>1440</itemMaxAge><autoBlockActive>true</autoBlockActive></data></repository>"
+  register: nexus_response
+  failed_when: nexus_response.status != 201
+  tags:
+     - tooling
+     - toolingnexus
+
+- name: Adding a Repository into Nexus {{ '#' }}5
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"
+       body="<repository><data><id>FuseSourceReleases</id><name>FuseSourceReleases</name><provider>maven2</provider><providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole><format>maven2</format><repoType>proxy</repoType><exposed>true</exposed><writePolicy>READ_ONLY</writePolicy><browseable>true</browseable><indexable>true</indexable><notFoundCacheTTL>1440</notFoundCacheTTL><repoPolicy>RELEASE</repoPolicy><checksumPolicy>WARN</checksumPolicy><downloadRemoteIndexes>true</downloadRemoteIndexes><remoteStorage><remoteStorageUrl>http{{ ':' }}//repo.fusesource.com/nexus/content/repositories/releases/</remoteStorageUrl></remoteStorage><fileTypeValidation>true</fileTypeValidation><artifactMaxAge>-1</artifactMaxAge><metadataMaxAge>1440</metadataMaxAge><itemMaxAge>1440</itemMaxAge><autoBlockActive>true</autoBlockActive></data></repository>" -X POST --header "Content-Type{{ ':' }}application/xml"
+  register: nexus_response
+  failed_when: nexus_response.status != 201
+  tags:
+     - tooling
+     - toolingnexus
+
+- name: Adding a Repo Groups into Nexus {{ '#' }}6
+  uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repo_groups"
+       body="<repo-group><data><id>forum</id><name>forum</name><provider>maven2</provider><format>maven2</format><repoType>group</repoType><exposed>true</exposed><providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole><repositories><repo-group-member><id>central</id><name>Central</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/central</resourceURI></repo-group-member><repo-group-member><id>FuseSourceEA</id><name>FuseSourceEA</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/FuseSourceEA</resourceURI></repo-group-member><repo-group-member><id>FuseSourceReleases</id><name>FuseSourceReleases</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/FuseSourceReleases</resourceURI></repo-group-member><repo-group-member><id>public</id><name>PublicRepositories</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/public</resourceURI></repo-group-member><repo-group-member><id>RedHatEA</id><name>RedHatEA</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/RedHatEA</resourceURI></repo-group-member><repo-group-member><id>RedHatGA</id><name>RedHatGA</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/RedHatGA</resourceURI></repo-group-member><repo-group-member><id>RedHatTP</id><name>RedHatTP</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/RedHatTP</resourceURI></repo-group-member><repo-group-member><id>releases</id><name>Releases</name><resourceURI>http{{ ':' }}//nexus.tooling.svc.cluster.local{{ ':' }}8081/service/local/repo_groups/forum/releases</resourceURI></repo-group-member></repositories></data></repo-group>"
+  register: nexus_response
+  failed_when: nexus_response.status != 201
+  tags:
+     - tooling
+     - toolingnexus

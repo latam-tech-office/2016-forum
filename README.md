@@ -69,12 +69,17 @@ Check if the user is OpenShift's System Administrator "system:admin" and verify 
 -- tags install_rhmap
 -- tags install_rhmap_core
 -- tags install_rhmap_mbaas
--- tags install_cloudforms
+-- tags tower
+-- tags cloudforms
 
 
 Pending Tasks:
 
 We tried really hard to provisioning and config all the necessary applications using each Application's API. Unfortunately, not all products has a full and rich API that enable us to config and add all the necessary information. Here are some pending tasks that you might need to add manually:
+
+. Red Hat Ansible Tower
+[PENDING: Robert]: Why does we need a forumadmin user inserted ? Can we just add demo user instead ?
+[PENDING: Robert]: Why tower needs a root/password from OpenShift ? Can we just use demo user instead ?
 
 . Red Hat CloudForms
 . Red Hat Mobile Application Platform
