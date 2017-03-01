@@ -72,6 +72,7 @@
   tags: 
      - configcloudforms
      - cloudforms                 
+     - cloudforms_tower
 
 - name: Fetch CloudForms Address
   command: oc get service/cloudforms --output jsonpath='{..spec.clusterIP}' --namespace {{ cloudforms_namespace }}
@@ -85,12 +86,14 @@
   tags: 
      - configcloudforms
      - cloudforms
+     - cloudforms_tower
                   
 - name: Define CloudForms FULL URL
   set_fact: cloudforms_full_url='{{ cloudforms_http_type }}{{ ':' }}//{{ cloudforms_url }}'
   tags:
      - configcloudforms
      - cloudforms
+     - cloudforms_tower
                   
 - name: Wait for CloudForms to be up{{ ':' }} {{ cloudforms_full_url }}
   uri: url='{{ cloudforms_full_url }}' validate_certs=no status_code=200 
@@ -105,6 +108,7 @@
 - name: Wait Business Central to settle down a while
   pause: seconds=60
   tags:
+     - configcloudforms
      - cloudforms
 
 - name: Fetch a Token from Management Infrastructure
@@ -166,8 +170,7 @@
   tags:
      - configcloudforms
      - createproviderscloudforms 
-     - cloudforms                       
-  
+
 - name: Adding Ansible Tower Provider to CloudForms
   uri:
     method: POST
@@ -175,14 +178,14 @@
     HEADER_Content-Type: application/json
     validate_certs: no
     return_content: yes
-    url: "{{ cloudforms_full_url }}/api/providers?provider_class=provider/"
+    url: "{{ cloudforms_full_url }}/api/providers?provider_class=provider"
     user: "{{ cloudforms_username }}"
     password: "{{ cloudforms_password }}"
     force_basic_auth: yes
     status_code: 200
-    body: '{"type":"ManageIQ::Providers::AnsibleTower::Provider","tenant_id":1000000000002,"name":"Ansible Tower 3","url":"https://tower.{{ ansibletower_namespace }}.svc.cluster.local","credentials": {"userid":"{{ ansibletower_username }}","password":"{{ ansibletower_password }}"}}'
-  ignore_errors: True
+    body: '{"type":"ManageIQ::Providers::AnsibleTower::Provider","name":"Ansible Tower 3","url":"http://tower.{{ ansibletower_namespace }}.svc.cluster.local/api/v1","credentials": {"userid":"{{ ansibletower_username }}","password":"{{ ansibletower_password }}"}}'
   tags:
+     - cloudforms
      - configcloudforms
      - createproviderscloudforms
-     - cloudforms
+     - cloudforms_tower
