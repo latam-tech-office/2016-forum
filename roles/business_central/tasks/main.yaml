@@ -11,6 +11,7 @@
   failed_when: jboss_installer_file.stat.exists == False
   tags:  
      - business_central
+     - check
 
 - name: Modifying all the installers so they have Running permissions
   file: path=templates/rhcs-bc/installs/{{ item.filename }} mode="u+x"

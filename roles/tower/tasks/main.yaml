@@ -4,6 +4,7 @@
   tags:
      - testlicense
      - tower
+     - check
 
 - name: Does the Ansible Tower license exists ?
   fail: msg="Ansible Tower License file{{ ':' }} {{ ansibletower_license_file }} wasn't found" 
