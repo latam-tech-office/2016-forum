@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: List
+items:
+{% for idx in range(pv_number) %}
+- apiVersion: v1
+  kind: PersistentVolume
+  metadata:
+    name: local{{ idx+1 }}
+  spec:
+    capacity:
+      storage: {{ pv_size }}
+    accessModes:
+      - ReadWriteMany
+      - ReadWriteOnce
+    nfs:
+      server: {{ nfs_server }}
+      path: {{ nfs_path_prefix }}{{ idx+1 }}
+    persistentVolumeReclaimPolicy: Recycle
+{% endfor %}
