@@ -19,12 +19,12 @@
      - locust
 
 - name: Create a New Build based on image{{ ':' }} {{ locust_docker_image }}
-  command: oc new-build {{ locust_docker_image }} --name=locust --binary=true --namespace {{ locust_namespace }} --to locust
+  command: oc new-build {{ locust_docker_image }} --name=locustcustom --binary=true --namespace {{ locust_namespace }} --to locust
   tags:
      - locust
 
 - name: Start a New Build based on a Dockerfile{{ ':' }}} templates/locust
-  command: oc start-build locust --from-dir=templates/locust --follow=true --wait=true --namespace {{ locust_namespace }}
+  command: oc start-build locustcustom --from-dir=templates/locust --follow=true --wait=true --namespace {{ locust_namespace }}
   tags:
      - locust
 
