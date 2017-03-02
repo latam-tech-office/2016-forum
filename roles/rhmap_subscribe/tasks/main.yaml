@@ -30,11 +30,11 @@
      - subscribe
      - rhmap
 
-- name: Update all packages based on the latest repositories
-  yum: name='*' state=latest update_cache=yes
-  tags:
-     - subscribe
-     - rhmap
+#- name: Update all packages based on the latest repositories
+#  yum: name='*' state=latest update_cache=yes
+#  tags:
+#     - subscribe
+#     - rhmap
 
 - name: Installing RHSM plugin subscription-manager-plugin-container
   yum: name="subscription-manager-plugin-container" state=present
