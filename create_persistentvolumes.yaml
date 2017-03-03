@@ -4,6 +4,12 @@
   hosts: localhost
   connection: local
   vars:
+    persistent_volumes:
+       - {"type": "tiny",   pv_size: 1,  pv_number: 5 }
+       - {"type": "small",  pv_size: 5,  pv_number: 5 }
+       - {"type": "normal", pv_size: 10, pv_number: 5 }
+       - {"type": "big",    pv_size: 20, pv_number: 5 }
+       - {"type": "large",  pv_size: 25, pv_number: 5 }
     pv_number: 20
     pv_size  : 5Gi
     nfs_server: 192.168.0.100
@@ -12,6 +18,8 @@
     - name: Create all the necessary directories
       file: path={{ nfs_path_prefix }}{{ item }} group=nfsnobody owner=nfsnobody mode=777 state=directory recurse=yes
       with_sequence: start=1 end={{ pv_number }}
+      tags:
+         - create
 
     - name: Create all the necessary information in /etc/exports
       template: src=templates/exports.j2 dest=/etc/exports
