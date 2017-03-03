@@ -80,7 +80,19 @@ parameters:
   name: JENKINS_IMAGE_STREAM_TAG
   value: jenkins:latest
 objects:
-# Jenkins Master
+### JENKINS JENKINS JENKINS JENKINS JENKINS JENKINS JENKINS JENKINS JENKINS JENKINS 
+###   JENKINS JENKINS JENKINS JENKINS JENKINS JENKINS JENKINS JENKINS JENKINS JENKINS 
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: jenkins
+  spec:
+    accessModes:
+      - ReadWriteOnce
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 10Gi
 - apiVersion: v1
   kind: Route
   metadata:
@@ -149,14 +161,14 @@ objects:
           terminationMessagePath: /dev/termination-log
           volumeMounts:
           - mountPath: /var/lib/jenkins
-            name: ${JENKINS_SERVICE_NAME}-data
+            name: jenkins-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         serviceAccountName: ${JENKINS_SERVICE_NAME}
         volumes:
-        - emptyDir:
-            medium: ""
-          name: ${JENKINS_SERVICE_NAME}-data
+        - name: jenkins-data
+          persistentVolumeClaim:
+            claimName: jenkins
     triggers:
     - imageChangeParams:
         automatic: true
@@ -220,7 +232,20 @@ objects:
       name: ${JENKINS_SERVICE_NAME}
     sessionAffinity: None
     type: ClusterIP
-# Sonatype Nexus
+
+### NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS 
+###  NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS NEXUS 
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: nexus
+  spec:
+    accessModes:
+      - ReadWriteOnce
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 25Gi
 - apiVersion: v1
   kind: Service
   metadata:
@@ -324,8 +349,9 @@ objects:
         restartPolicy: Always
         terminationGracePeriodSeconds: 30
         volumes:
-        - emptyDir: {}
-          name: nexus-data
+        - name: nexus-data
+          persistentVolumeClaim:
+            claimName: nexus
     triggers:
     - type: ConfigChange
     - imageChangeParams:
@@ -338,6 +364,41 @@ objects:
       type: ImageChange
   status: {}
 # Gogs
+### GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS 
+###   GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS GOGS 
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: postgresql-gogs
+  spec:
+    accessModes:
+      - ReadWriteOnce
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 5Gi
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: gogs-configuration
+  spec:
+    accessModes:
+      - ReadWriteOnce
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: gogs-repositories
+  spec:
+    accessModes:
+      - ReadWriteOnce
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 5Gi 
 - apiVersion: v1
   kind: Service
   metadata:
@@ -446,6 +507,11 @@ objects:
             limits:
               memory: 512Mi
           terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /etc/gogs/conf
+            name: gogs-configuration
+          - mountPath: /home/gogs/gogs-repositories
+            name: gogs-repositories
           readinessProbe:
             failureThreshold: 3
             initialDelaySeconds: 15
@@ -459,6 +525,13 @@ objects:
         restartPolicy: Always
         securityContext: {}
         terminationGracePeriodSeconds: 30
+        volumes:
+        - name: gogs-configuration
+          persistentVolumeClaim:
+            claimName: gogs-configuration
+        - name: gogs-repositories
+          persistentVolumeClaim:
+            claimName: gogs-repositories
     triggers:
     - type: ConfigChange
     - imageChangeParams:
@@ -516,6 +589,9 @@ objects:
           ports:
           - containerPort: 5432
             protocol: TCP
+          volumeMounts:
+          - mountPath: /var/lib/pgsql/data
+            name: postgresql-data
           readinessProbe:
             exec:
               command:
@@ -535,16 +611,14 @@ objects:
             capabilities: {}
             privileged: false
           terminationMessagePath: /dev/termination-log
-          volumeMounts:
-          - mountPath: /var/lib/pgsql/data
-            name: postgresql-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext: {}
         terminationGracePeriodSeconds: 30
         volumes:
-        - emptyDir: {}
-          name: postgresql-data
+        - name: postgresql-data
+          persistentVolumeClaim:
+            claimName: postgresql-gogs
     triggers:
     - imageChangeParams:
         automatic: true

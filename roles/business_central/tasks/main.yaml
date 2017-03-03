@@ -101,6 +101,20 @@
      - business_central
      - project_creation
 
+- name: Create Persistent Volume Claims for Business Central
+  command: oc create --filename templates/business-central-persistentvolumeclaims.yaml --namespace {{ businesscentral_namespace }}
+  tags:
+     - business_central
+     - project_creation
+     - persistent_volume
+
+- name: Create Volumes for this Persistent Volume Claim
+  command: oc volume deploymentconfig/business-central --name=business-central-data --add --mount-path=/opt/jboss/brms/jboss-eap-6.4/bin/.niogit/ --claim-name=business-central --namespace {{ businesscentral_namespace }}
+  tags:
+     - business_central
+     - project_creation
+     - persistent_volume
+
 - name: Expose the route as business-central.{{ openshift_cloudapps_domain }} 
   command: oc expose service business-central --hostname=business-central.{{ openshift_cloudapps_domain }} --namespace {{ businesscentral_namespace }}
   tags:

@@ -62,7 +62,7 @@
   tags: 
      - create
      - tower
-         
+
 - name: Create the application based on a Docker Image {{ ansibletower_dockerimage }}
   command: oc new-app --name=tower --docker-image={{ ansibletower_dockerimage }} --namespace {{ ansibletower_namespace }}
   tags: 
@@ -75,6 +75,36 @@
   tags: 
      - create
      - tower
+
+- name: Add a port 80 to DeploymentConfig so it allows the Pod to communicate with this port
+  command: oc patch deploymentconfig/tower --patch '{"spec"{{ ':' }} {"template"{{ ':' }} {"spec"{{ ':' }} {"containers"{{ ':' }} [{"name"{{ ':' }} "tower","ports"{{ ':' }} [{"containerPort"{{ ':' }} 80, "protocol"{{ ':' }} "TCP"}]}]}}}}' --namespace {{ ansibletower_namespace }}
+  tags:
+     - create
+     - tower
+
+- name: Create the service for this container on port 80 for better integration with CloudForms, named "{{ ansibletower_web_service }}"
+  command: oc expose deploymentconfig/tower --port=80 --name={{ ansibletower_web_service }} --namespace {{ ansibletower_namespace }}
+  ignore_errors: Yes
+  tags:
+     - create
+     - tower
+
+- name: Create Persistent Volume Claims for Ansible Tower (/var and /etc/tower)
+  command: oc create --filename=templates/ansibletower-persistentvolumeclaims.yaml --namespace {{ ansibletower_namespace }}
+  tags:
+     - create
+     - tower
+     - persistentvolume
+
+- name: Create persistentvolumes into Deploymentconfig
+  command: oc volume deploymentconfig/tower --name={{ item.name }} --add --mount-path={{ item.directory }} --claim-name={{ item.claim }} --namespace {{ ansibletower_namespace }} 
+  with_items:
+     - { "name": "tower-data",          "directory": "/var",       "claim":"tower-data" }
+     - { "name": "tower-configuration", "directory": "/etc/tower", "claim":"tower-configuration" }
+  tags:
+     - create
+     - tower  
+     - persistentvolume
          
 - name: Patch the DeploymentConfig to allow Privileged Containers
   command: oc patch deploymentconfig/tower --patch '{"spec"{{ ':' }}{"template"{{ ':' }}{"spec"{{ ':' }} {"containers"{{ ':' }} [{"name"{{ ':' }}"tower","securityContext"{{ ':' }} {"privileged"{{ ':' }} true}} ],"serviceAccountName"{{ ':' }}"satower"}}}}' --namespace {{ ansibletower_namespace }}
