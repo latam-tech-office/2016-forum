@@ -1,7 +1,0 @@
----
-- name: create directory for NFS Exports
-  file: path={{ nfs_path_prefix }}{{ item }}-{{ pv_size }}g-{{ type }} group=nfsnobody owner=nfsnobody mode=777 state=directory recurse=yes
-  with_sequence: start=1 end={{ pv_number }}
-  tags:
-     - create
- 
