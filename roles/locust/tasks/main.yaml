@@ -19,7 +19,7 @@
      - locust
 
 - name: Create a New Build based on image{{ ':' }} {{ locust_docker_image }}
-  command: oc new-build {{ locust_docker_image }} --name=locustcustom --binary=true --namespace {{ locust_namespace }} --to locust
+  command: oc new-build {{ locust_docker_image }} --name=locustcustom --binary=true --namespace {{ locust_namespace }} --to loc
   tags:
      - locust
 
@@ -29,11 +29,11 @@
      - locust
 
 - name: Create a New Application based on a Image built
-  command: oc new-app locust --namespace {{ locust_namespace }}
+  command: oc new-app loc --namespace {{ locust_namespace }}
   tags:
      - locust
 
 - name: Expose a Route{{ ':' }} locust.{{ openshift_cloudapps_domain }}
-  command: oc expose service/locust --hostname=locust.{{ openshift_cloudapps_domain }} --namespace {{ locust_namespace }} --port 8089
+  command: oc expose service/loc --hostname=locust.{{ openshift_cloudapps_domain }} --namespace {{ locust_namespace }} --port 8089
   tags:
      - locust
