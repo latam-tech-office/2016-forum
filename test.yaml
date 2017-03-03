@@ -1,6 +1,0 @@
-- hosts: localhost
-  tasks:
-    - debug: msg='Index {{ item.0 }}  and type is {{ item.type }} with size {{ item }}' 
-      with_indexed_items:
-           - {"type": "small", size: 1}
-           - {"type": "regular", size: 5}

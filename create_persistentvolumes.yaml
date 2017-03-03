@@ -45,13 +45,6 @@
       tags:
          - create
 
-    - name: Create all the necessary information in /etc/exports
-      template: src=templates/exports.j2 dest=/etc/exports
-      with_items: "{{ persistent_volumes }}"
-
-    - name: Create all the necessary information in /etc/exports
-      template: src=templates/exports.j2 dest=/etc/exports
-
     - name: Add the following lines into the IPTables rules for NFS
       lineinfile: dest=/etc/sysconfig/iptables state=present insertbefore="COMMIT" line="{{ item }}"
       with_items: 
@@ -60,18 +53,22 @@
          - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 20048 -j ACCEPT"
          - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 50825 -j ACCEPT"
          - "-A OS_FIREWALL_ALLOW -p tcp -m state --state NEW -m tcp --dport 53248 -j ACCEPT"
-      tags: iptables
+      tags: 
+         - iptables
 
     - name: Restart IPTables Service
       service: name=iptables state=restarted
       notify: Restart IPTables Service
-      tags: iptables
+      tags: 
+         - iptables
 
     - name: Modify information into NFS file
       lineinfile: dest=/etc/sysconfig/nfs state=present regexp={{ item.regex }} line={{ item.option }}
       with_items:
          - { regex: "^RPCMOUNTDOPTS", option: "RPCMOUNTDOPTS=\"-p 20048\""}
          - { regex: "^STATDARG",      option: "STATDARG=\"-p 50825\""}
+      tags:
+         - nfs
 
 # Bug according to: https://access.redhat.com/solutions/2200331
 #    - name: Modify information on sysctl
@@ -93,12 +90,24 @@
      
     - name: Template all the necessary Persistent Volumes in a temporary directory
       template: src=templates/persistentvolume.yaml.j2 dest=/tmp/persistentvolume.yaml
+      tags: 
+         - pv_yaml
 
     - name: Change to administrator user in OpenShift
       command: oc login --username=system:admin
+      tags:
+         - pv_yaml
+
+    - name: Delete all existing PV's before creating
+      command: oc delete pv --all
+      ignore_errors: True
+      tags:
+         - pv_yaml
 
     - name: Create the PV's from a temporary directory
       command: oc create -f /tmp/persistentvolume.yaml
+      tags:
+         - pv_yaml
 
   handlers:
     - name: Restart IPTables Service
