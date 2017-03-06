@@ -207,6 +207,25 @@
      - configtower
      - createuserstower
 
+- name: Adding forumuser to Ansible Tower
+  uri:  
+    method: POST  
+    status_code: 201  
+    body_format: json   
+    url: "{{ ansible_tower_url }}/api/v1/users/"
+    HEADER_Content-type: "application/json" 
+    HEADER_Accept: "application/json"
+    user: "{{ ansibletower_username }}"
+    password: "{{ ansibletower_password }}" 
+    force_basic_auth: yes 
+    validate_certs: no 
+    return_content: yes
+    body: '{"username": "forumuser","first_name": "Forum","last_name": "User","email": "forumuser@{{ openshift_domain }}","is_superuser": false,"is_system_auditor": false,"password": "{{ password }}"}'
+  tags: 
+     - install
+     - configtower
+     - createuserstower
+
 - name: Adding forumadmin to Ansible Tower
   uri:
     method: POST
@@ -221,28 +240,9 @@
     body: '{"username": "forumadmin","first_name": "Forum","last_name": "Admin","email": "forumadmin@{{ openshift_domain }}","is_superuser": true,"is_system_auditor": false,"password": "{{ password }}"}'
     status_code: 201
   tags:
-     - tower
-     - configtower
-     - createuserstower
- 
-    
-#- name: Adding "{{ username }}" to Ansible Tower
-#  uri:
-#    method: POST
-#    body_format: json
-#    HEADER_Content-Type: application/json
-#    validate_certs: no
-#    return_content: yes
-#    url: "{{ ansible_tower_url }}/api/v1/users/"
-#    user: "{{ ansibletower_username }}"
-#    password: "{{ ansibletower_password }}"
-#    force_basic_auth: yes
-#    body: '{"username": "{{ username }}","first_name": "Demo","last_name": "User","email": "{{ username }}@{{ openshift_domain }}","is_superuser": true,"is_system_auditor": false,"password": "{{ password }}"}'
-#    status_code: 201
-#  tags:
-#     - tower
-#     - configtower
-#     - createuserstower
+      - install
+      - configtower
+      - createuserstower
 
 - name: Adding forumauditor to Ansible Tower
   uri:
@@ -258,9 +258,9 @@
     status_code: 201
     body: '{"username": "forumauditor","first_name": "Forum","last_name": "Auditor","email": "forumauditor@{{ openshift_domain }}","is_superuser": false,"is_system_auditor": true,"password": "{{ password }}"}'
   tags:
-     - tower
-     - configtower
-     - createuserstower
+       - install
+       - configtower
+       - createuserstower
 
 - name: Creating OpenShift Enterprise 3 Project within Ansible Tower
   uri:
@@ -276,10 +276,10 @@
     body: '{"name": "OpenShift Enterprise 3 Project","description": "Project for Automating OpenShift Enterprise 3","local_path": "","scm_type": "git","scm_url": "https://github.com/rcalvaga/ansible-rh-forum-latam","scm_branch": "","scm_clean": true,"scm_delete_on_update": true,"credential": null,"organization": 1,"scm_update_on_launch": true,"scm_update_cache_timeout": 0}'
     status_code: 201
   tags:
-     - tower
-     - configtower
-     - createprojectstower
- 
+       - install
+       - configtower
+       - createprojectstower
+
 - name: Creating LATAM Red Hat Forum Team within Ansible Tower
   uri:
     method: POST
@@ -294,10 +294,10 @@
     body: '{"name": "LATAM Red Hat Forum Team","description": "LATAM Red Hat Forum Team","organization": 1}'
     status_code: 201
   tags:
-     - tower
-     - configtower
-     - createteamstower
- 
+       - install
+       - configtower
+       - createteamstower
+
 - name: Creating OpenShift Credentials within Ansible Tower
   uri:
     method: POST
@@ -309,13 +309,13 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "OpenShift Credentials","description": "OpenShift Credentials","kind": "ssh","host": "","username": "{{ username }}","password": "{{ password }}","security_token": "","project": "37","domain": "","ssh_key_data": "","ssh_key_unlock": "","organization": 1,"become_method": "","become_ansibletower_username": "","become_password": "","vault_password": "","subscription": "","tenant": "","secret": "","client": "","authorize": false,"authorize_password": "","user": null,"team": 1}'
+    body: '{"name": "OpenShift Credentials","description": "OpenShift Credentials","kind": "ssh","host": "","username": "{{ openshift_master_username }}","password": "{{ openshift_master_password }}","security_token": "","project": "37","domain": "","ssh_key_data": "","ssh_key_unlock": "","organization": 1,"become_method": "","become_ansibletower_username": "","become_password": "","vault_password": "","subscription": "","tenant": "","secret": "","client": "","authorize": false,"authorize_password": "","user": null,"team": 1}'
     status_code: 201
   tags:
-     - tower
-     - configtower
-     - createcredentialstower
- 
+       - install
+       - configtower
+       - createcredentialstower
+
 - name: Creating OpenShift Inventory within Ansible Tower
   uri:
     method: POST
@@ -330,10 +330,10 @@
     body: '{"name": "OpenShift Inventory","description": "OpenShift Inventory","organization": 1,"variables": "---"}'
     status_code: 201
   tags:
-     - tower
-     - configtower
-     - createinventoriestower
-  
+       - install
+       - configtower
+       - createinventoriestower
+
 - name: Creating master-group within Ansible Tower
   uri:
     method: POST
@@ -348,10 +348,10 @@
     body: '{"name": "master-group","description": "Master group of OpenShift","inventory": 34,"variables": ""}'
     status_code: 201
   tags:
-     - tower
-     - configtower
-     - creategroupstower
- 
+       - install
+       - configtower
+       - creategroupstower
+
 - name: Creating nodes-group within Ansible Tower
   uri:
     method: POST
@@ -366,11 +366,11 @@
     body: '{"name": "nodes-group","description": "Nodes group of OpenShift","inventory": 34,"variables": ""}'
     status_code: 201
   tags:
-     - tower
-     - configtower
-     - creategroupstower
-  
-- name: Creating OSE Master Host within Ansible Tower
+       - install
+       - configtower
+       - creategroupstower
+
+- name: Creating OSE Master "{{ openshift_master_hostname }}" Host within Ansible Tower
   uri:
     method: POST
     body_format: json
@@ -381,13 +381,13 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "openshift.default.svc.cluster.local","description": "Master Server of OpenShift","inventory": 34,"enabled": true,"instance_id": "","variables": ""}'
+    body: '{"name": "{{ openshift_master_hostname }}","description": "Master Server of OpenShift","inventory": 34,"enabled": true,"instance_id": "","variables": ""}'
     status_code: 201
   tags:
-     - tower
-     - configtower
-     - createhoststower
- 
+       - install
+       - configtower
+       - createhoststower
+
 - name: Creating "Create a Project In OpenShift 3" Job Template within Ansible Tower
   uri:
     method: POST
@@ -399,18 +399,18 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Create a Project In OpenShift 3","description": "Create a Project In OpenShift 3 Enterprise","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-create-project-as-admin.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "openshift.default.svc.cluster.local","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Create a Project In OpenShift 3","description": "Create a Project In OpenShift 3 Enterprise","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-create-project-as-admin.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
   retries: 10
   delay: 10
   tags:
-     - tower
-     - configtower
-     - createjobtemplatestower
+       - install
+       - configtower
+       - createjobtemplatestower
 
-- name: Creating "Create LATAM Red Hat Forum 2016 Apps in OpenShift 3" Job Template within Ansible Tower
+- name: Creating "Create RH Forum 2016 Apps in OpenShift 3" Job Template within Ansible Tower
   uri:
     method: POST
     body_format: json
@@ -421,41 +421,17 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Create LATAM Red Hat Forum 2016 Apps in OpenShift 3","description": "Create RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-create-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "openshift.default.svc.cluster.local","verbosity": 1,"extra_vars": "---\nproject_name:\ndemo_environment:\ndemo_user:\napp_template:\ntooling_user:\ncicd_user:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Create RH Forum 2016 Apps in OpenShift 3","description": "Create RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-create-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name:\ndemo_environment:\ndemo_user:\napp_template:\ntooling_user:\ncicd_user:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
   retries: 10
   delay: 10
   tags:
-     - tower
-     - configtower
-     - createjobtemplatestower
-    
+       - install
+       - configtower
+       - createjobtemplatestower
 
-- name: Creating "Delete LATAM Red Hat Forum 2016 Apps in OpenShift 3" Job Template within Ansible Tower
-  uri:
-    method: POST
-    body_format: json
-    HEADER_Content-Type: application/json
-    validate_certs: no
-    return_content: yes
-    url: "{{ ansible_tower_url }}/api/v1/job_templates/"
-    user: "{{ ansibletower_username }}"
-    password: "{{ ansibletower_password }}"
-    force_basic_auth: yes
-    body: '{"name": "Delete LATAM Red Hat Forum 2016 Apps in OpenShift 3","description": "Delete RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-delete-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "openshift.default.svc.cluster.local","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
-    status_code: 201
-  register: result
-  until: result.status == 201
-  retries: 10
-  delay: 10
-  tags:
-     - tower
-     - configtower
-     - createjobtemplatestower
-    
-    
 - name: Creating "Delete a Project In OpenShift 3" Job Template within Ansible Tower
   uri:
     method: POST
@@ -467,13 +443,35 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Delete a Project In OpenShift 3","description": "Delete a Project In OpenShift 3 Enterprise","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-delete-project-as-admin.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "openshift.default.svc.cluster.local","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Delete a Project In OpenShift 3","description": "Delete a Project In OpenShift 3 Enterprise","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-delete-project-as-admin.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
   retries: 10
   delay: 10
   tags:
-     - tower
-     - configtower
-     - createjobtemplatestower
+       - install
+       - configtower
+       - createjobtemplatestower
+
+- name: Creating "Delete RH Forum 2016 Apps in OpenShift 3" Job Template within Ansible Tower
+  uri:
+    method: POST
+    body_format: json
+    HEADER_Content-Type: application/json
+    validate_certs: no
+    return_content: yes
+    url: "{{ ansible_tower_url }}/api/v1/job_templates/"
+    user: "{{ ansibletower_username }}"
+    password: "{{ ansibletower_password }}"
+    force_basic_auth: yes
+    body: '{"name": "Delete RH Forum 2016 Apps in OpenShift 3","description": "Delete RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-delete-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    status_code: 201
+  register: result
+  until: result.status == 201
+  retries: 10
+  delay: 10
+  tags:
+       - install
+       - configtower
+       - createjobtemplatestower
