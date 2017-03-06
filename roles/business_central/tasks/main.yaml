@@ -55,7 +55,7 @@
   command: oadm new-project {{ businesscentral_namespace }} --display-name="Business Central{{ ':' }} LATAM Red Hat Forum 2016" --admin={{ username }}
   register: project_creation
   until: project_creation.rc == 0
-  retries: 5
+  retries: 30
   delay: 15
   tags:
      - business_central

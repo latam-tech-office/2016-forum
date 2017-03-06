@@ -35,7 +35,9 @@ RUN sed -i "s:<installpath>.*</installpath>:<installpath>$BRMS_HOME</installpath
    && cd /opt/jboss/brms/jboss-eap-6.4/bin/.niogit/brms.git \
    && git remote set-url origin http://${GOGS_USERNAME}:${GOGS_PASSWORD}@${GOGS_URL}/${GOGS_USERNAME}/brms.git \
    && echo $'#!/bin/sh\ngit push origin master' > /opt/jboss/brms/jboss-eap-6.4/bin/.niogit/brms.git/hooks/post-commit \
-   && chmod u+x /opt/jboss/brms/jboss-eap-6.4/bin/.niogit/brms.git/hooks/post-commit
+   && chmod u+x /opt/jboss/brms/jboss-eap-6.4/bin/.niogit/brms.git/hooks/post-commit \
+### ADDED BY MALTRON: This it will run everytime JBoss starts
+   && sed -i '2isource /tmp/config.sh' /opt/jboss/brms/jboss-eap-6.4/bin/standalone.sh
 
 # Copy demo and support files
 COPY support/userinfo.properties $BRMS_HOME/standalone/deployments/business-central.war/WEB-INF/classes/
