@@ -222,7 +222,7 @@
     return_content: yes
     body: '{"username": "forumuser","first_name": "Forum","last_name": "User","email": "forumuser@{{ openshift_domain }}","is_superuser": false,"is_system_auditor": false,"password": "{{ password }}"}'
   tags: 
-     - install
+     - tower
      - configtower
      - createuserstower
 
@@ -240,7 +240,7 @@
     body: '{"username": "forumadmin","first_name": "Forum","last_name": "Admin","email": "forumadmin@{{ openshift_domain }}","is_superuser": true,"is_system_auditor": false,"password": "{{ password }}"}'
     status_code: 201
   tags:
-      - install
+      - tower
       - configtower
       - createuserstower
 
@@ -258,7 +258,7 @@
     status_code: 201
     body: '{"username": "forumauditor","first_name": "Forum","last_name": "Auditor","email": "forumauditor@{{ openshift_domain }}","is_superuser": false,"is_system_auditor": true,"password": "{{ password }}"}'
   tags:
-       - install
+       - tower
        - configtower
        - createuserstower
 
@@ -276,7 +276,7 @@
     body: '{"name": "OpenShift Enterprise 3 Project","description": "Project for Automating OpenShift Enterprise 3","local_path": "","scm_type": "git","scm_url": "https://github.com/rcalvaga/ansible-rh-forum-latam","scm_branch": "","scm_clean": true,"scm_delete_on_update": true,"credential": null,"organization": 1,"scm_update_on_launch": true,"scm_update_cache_timeout": 0}'
     status_code: 201
   tags:
-       - install
+       - tower
        - configtower
        - createprojectstower
 
@@ -294,7 +294,7 @@
     body: '{"name": "LATAM Red Hat Forum Team","description": "LATAM Red Hat Forum Team","organization": 1}'
     status_code: 201
   tags:
-       - install
+       - tower
        - configtower
        - createteamstower
 
@@ -312,7 +312,7 @@
     body: '{"name": "OpenShift Credentials","description": "OpenShift Credentials","kind": "ssh","host": "","username": "{{ openshift_master_username }}","password": "{{ openshift_master_password }}","security_token": "","project": "37","domain": "","ssh_key_data": "","ssh_key_unlock": "","organization": 1,"become_method": "","become_ansibletower_username": "","become_password": "","vault_password": "","subscription": "","tenant": "","secret": "","client": "","authorize": false,"authorize_password": "","user": null,"team": 1}'
     status_code: 201
   tags:
-       - install
+       - tower
        - configtower
        - createcredentialstower
 
@@ -330,7 +330,7 @@
     body: '{"name": "OpenShift Inventory","description": "OpenShift Inventory","organization": 1,"variables": "---"}'
     status_code: 201
   tags:
-       - install
+       - tower
        - configtower
        - createinventoriestower
 
@@ -348,7 +348,7 @@
     body: '{"name": "master-group","description": "Master group of OpenShift","inventory": 34,"variables": ""}'
     status_code: 201
   tags:
-       - install
+       - tower
        - configtower
        - creategroupstower
 
@@ -366,7 +366,7 @@
     body: '{"name": "nodes-group","description": "Nodes group of OpenShift","inventory": 34,"variables": ""}'
     status_code: 201
   tags:
-       - install
+       - tower
        - configtower
        - creategroupstower
 
@@ -384,7 +384,7 @@
     body: '{"name": "{{ openshift_master_hostname }}","description": "Master Server of OpenShift","inventory": 34,"enabled": true,"instance_id": "","variables": ""}'
     status_code: 201
   tags:
-       - install
+       - tower
        - configtower
        - createhoststower
 
@@ -406,7 +406,7 @@
   retries: 10
   delay: 10
   tags:
-       - install
+       - tower
        - configtower
        - createjobtemplatestower
 
@@ -428,7 +428,7 @@
   retries: 10
   delay: 10
   tags:
-       - install
+       - tower
        - configtower
        - createjobtemplatestower
 
@@ -450,7 +450,7 @@
   retries: 10
   delay: 10
   tags:
-       - install
+       - tower
        - configtower
        - createjobtemplatestower
 
@@ -472,6 +472,6 @@
   retries: 10
   delay: 10
   tags:
-       - install
+       - tower
        - configtower
        - createjobtemplatestower
