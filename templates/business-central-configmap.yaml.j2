@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: configrepo-businesscentral
+  data:
+    config.sh: |-
+      #!/bin/bash
+      cd /opt/jboss/brms/jboss-eap-6.4/bin/.niogit/
+      rm -rf brms.git/
+      git clone http://gogs.{{ tooling_namespace }}.svc.cluster.local:3000/{{ username }}/brms.git --bare /opt/jboss/brms/jboss-eap-6.4/bin/.niogit/brms.git
+      cd brms.git
+      git remote set-url origin 'http://{{ username }}:{{ password }}@gogs.{{ tooling_namespace }}.svc.cluster.local:3000/{{ username }}/brms.git'
+      echo $'#!/bin/sh\ngit push origin master' > /opt/jboss/brms/jboss-eap-6.4/bin/.niogit/brms.git/hooks/post-commit
+      chmod u+x /opt/jboss/brms/jboss-eap-6.4/bin/.niogit/brms.git/hooks/post-commit

@@ -101,6 +101,35 @@
      - business_central
      - project_creation
 
+- name: Delete any previous ConfigMap previously created
+  command: oc delete configmap/configrepo-businesscentral --namespace {{ businesscentral_namespace }}
+  ignore_errors: True
+  tags:
+     - business_central
+     - project_creation
+     - configmap
+
+- name: Generate a ConfigMap based on a template{{ ':' }} templates/business-central-configmap.yaml.j2
+  template: src=templates/business-central-configmap.yaml.j2 dest=/tmp/business-central-configmap.yaml
+  tags:
+     - business_central
+     - project_creation
+     - configmap
+
+- name: Create a ConfigMap 
+  command: oc create --filename /tmp/business-central-configmap.yaml --namespace {{ businesscentral_namespace }}
+  tags:
+     - business_central
+     - project_creation
+     - configmap
+
+- name: Patch DeploymentConfig to run ConfigMap every time starts
+  command: oc patch deploymentconfig/business-central --patch '{"spec"{{ ':' }} {"template"{{ ':' }} {"metadata"{{ ':' }} {"annotations"{{ ':' }} {"openshift.io/container.business-central.image.entrypoint"{{ ':' }} "[\"bash\", \"/tmp/config.sh;\",\"/opt/jboss/brms/jboss-eap-6.4/bin/standalone.sh\",\"-c\",\"standalone.xml\",\"-b\",\"0.0.0.0\",\"-bmanagement\",\"0.0.0.0\",\"-Djboss.as.management.blocking.timeout=3600\"]"}},"spec"{{ ':' }} {"volumes"{{ ':' }} [{"name"{{ ':' }} "script-volume","configMap"{{ ':' }} { "name"{{ ':' }} "configrepo-businesscentral", "items"{{ ':' }} [{"key"{{ ':' }} "config.sh","path"{{ ':' }} "config.sh"}], "defaultMode"{{ ':' }} 420 }}],"containers"{{ ':' }} [{"name"{{ ':' }} "business-central", "volumeMounts"{{ ':' }} [{"name"{{ ':' }} "script-volume","mountPath"{{ ':' }} "/tmp"}]}]}}}}' --namespace {{ businesscentral_namespace }}
+  tags:
+     - business_central
+     - project_creation
+     - configmap
+
 - name: Create Persistent Volume Claims for Business Central
   command: oc create --filename templates/business-central-persistentvolumeclaims.yaml --namespace {{ businesscentral_namespace }}
   tags:
