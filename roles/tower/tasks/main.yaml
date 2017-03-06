@@ -70,7 +70,7 @@
      - tower
          
 - name: Create the service for this container on port 443 (In case of Robert's Docker Image)
-  command: oc expose deploymentconfig/tower --port=443 --namespace {{ ansibletower_namespace }}
+  command: oc expose deploymentconfig/tower --port=443 --port=8080 --port=80 --namespace {{ ansibletower_namespace }}
   ignore_errors: Yes
   tags: 
      - create
