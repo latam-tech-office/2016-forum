@@ -89,22 +89,22 @@
      - create
      - tower
 
-- name: Create Persistent Volume Claims for Ansible Tower (/var and /etc/tower)
-  command: oc create --filename=templates/ansibletower-persistentvolumeclaims.yaml --namespace {{ ansibletower_namespace }}
-  tags:
-     - create
-     - tower
-     - persistentvolume
+#- name: Create Persistent Volume Claims for Ansible Tower (/var and /etc/tower)
+#  command: oc create --filename=templates/ansibletower-persistentvolumeclaims.yaml --namespace {{ ansibletower_namespace }}
+#  tags:
+#     - create
+#     - tower
+#     - persistentvolume
 
-- name: Create persistentvolumes into Deploymentconfig
-  command: oc volume deploymentconfig/tower --name={{ item.name }} --add --mount-path={{ item.directory }} --claim-name={{ item.claim }} --namespace {{ ansibletower_namespace }} 
-  with_items:
-     - { "name": "tower-data",          "directory": "/var",       "claim":"tower-data" }
-     - { "name": "tower-configuration", "directory": "/etc/tower", "claim":"tower-configuration" }
-  tags:
-     - create
-     - tower  
-     - persistentvolume
+#- name: Create persistentvolumes into Deploymentconfig
+#  command: oc volume deploymentconfig/tower --name={{ item.name }} --add --mount-path={{ item.directory }} --claim-name={{ item.claim }} --namespace {{ ansibletower_namespace }} 
+#  with_items:
+#     - { "name": "tower-data",          "directory": "/var",       "claim":"tower-data" }
+#     - { "name": "tower-configuration", "directory": "/etc/tower", "claim":"tower-configuration" }
+#  tags:
+#     - create
+#     - tower  
+#     - persistentvolume
          
 - name: Patch the DeploymentConfig to allow Privileged Containers
   command: oc patch deploymentconfig/tower --patch '{"spec"{{ ':' }}{"template"{{ ':' }}{"spec"{{ ':' }} {"containers"{{ ':' }} [{"name"{{ ':' }}"tower","securityContext"{{ ':' }} {"privileged"{{ ':' }} true}} ],"serviceAccountName"{{ ':' }}"satower"}}}}' --namespace {{ ansibletower_namespace }}
@@ -137,11 +137,13 @@
   failed_when: ansible_tower_port.rc != 0
   tags:
      - tower
+     - configtower
          
 - set_fact: tower_port={{ ansible_tower_port.stdout }}
   when: '{{ "rcalvaga" not in ansibletower_dockerimage }}'
   tags:
      - tower
+     - configtower
          
 - name: Fetch Ansible Tower port (Robert's Docker Image)
   command: oc get service/tower --output jsonpath='{..spec.ports.*.port}' --namespace {{ ansibletower_namespace }}
@@ -150,16 +152,19 @@
   failed_when: ansible_tower_port.rc != 0
   tags:
      - tower
+     - configtower
          
 - set_fact: tower_port={{ ansible_tower_port.stdout }}
   when: '{{ "rcalvaga" in ansibletower_dockerimage }}'
   tags:
      - tower
+     - configtower
          
 - name: Define Ansible Tower URL
   set_fact: ansible_tower_url='https://tower.{{ ansibletower_namespace }}.svc.cluster.local:{{ tower_port }}'
   tags: 
      - tower
+     - configtower
          
 - name: Wait for Ansible Tower to be up{{ ':' }} {{ ansible_tower_url }}
   uri: url="{{ ansible_tower_url }}" validate_certs=no status_code=200 
@@ -169,6 +174,7 @@
   delay: 10
   tags: 
      - tower
+     - configtower
          
 - set_fact: license_content={{ lookup('file', '{{ ansibletower_license_file }}') }}
   tags:
@@ -201,7 +207,7 @@
     force_basic_auth: yes 
     validate_certs: no 
     return_content: yes
-    body: '{"username": "{{ username }}","first_name": "Demo","last_name": "Demo","email": "demo@{{ openshift_domain }}","is_superuser": false,"is_system_auditor": false,"password": "{{ password }}"}'
+    body: '{"username": "{{ username }}","first_name": "Demo","last_name": "Demo","email": "{{ username }}@{{ openshift_domain }}","is_superuser": true,"is_system_auditor": false,"password": "{{ password }}"}'
   tags: 
      - tower
      - configtower
@@ -421,7 +427,7 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Create RH Forum 2016 Apps in OpenShift 3","description": "Create RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-create-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name:\ndemo_environment:\ndemo_user:\napp_template:\ntooling_user:\ncicd_user:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Create RH Forum 2016 Apps in OpenShift 3","description": "Create RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-create-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name: forum-prod\ndemo_environment: Prod\ndemo_user: {{ username }}\napp_template: forum-apps\ntooling_user: tooling\ncicd_user: cicd","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
@@ -465,7 +471,7 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Delete RH Forum 2016 Apps in OpenShift 3","description": "Delete RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-delete-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Delete RH Forum 2016 Apps in OpenShift 3","description": "Delete RH Forum 2016 Project & Apps in OpenShift Enterprise 3","job_type": "run","inventory": 34,"project": 37,"playbook": "openshift-ansible/openshift-delete-forum-2016-application.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name: forum-prod","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
