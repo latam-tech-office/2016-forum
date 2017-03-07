@@ -132,9 +132,9 @@
     status_code: 200
     body: '{"name": "Forum Admin","userid": "{{ username }}","password": "{{ password }}","email": "{{ username }}@{{ openshift_domain }}","group": {"id": 1000000000002}}'
   tags:
-     - configcloudforms
-     - createuserscloudforms
-     - cloudforms                   
+       - install
+       - configcloudforms
+       - createuserscloudforms        
   
 - name: Adding Red Hat Forum LATAM 2016 Tenant to CloudForms
   uri:
@@ -150,10 +150,10 @@
     status_code: 200
     body: '{"name": "RHT Forum Tenant","description": "Red Hat Forum LATAM 2016 Tenant","parent": {"href": "{{ cloudforms_full_url }}/api/tenants/1000000000001"}}'
   tags:
-     - configcloudforms
-     - createtenantscloudforms  
-     - cloudforms                        
-  
+       - install
+       - configcloudforms
+       - createtenantscloudforms   
+       
 - name: Adding OpenShift Container Platform Provider to CloudForms
   uri:
     method: POST
@@ -168,9 +168,10 @@
     status_code: 200
     body: '{"type":"ManageIQ::Providers::OpenshiftEnterprise::ContainerManager","tenant_id":1000000000002,"name":"OpenShift 3.4 Container Platform","connection_configurations" : [{"endpoint": {"role": "default","hostname":"openshift.default.svc.cluster.local","port":"443"},"authentication": {"role": "bearer","auth_key": "{{ management_infra_token.stdout }}"}},{"endpoint": {"role": "hawkular","hostname":"hawkular-metrics.openshift-infra.svc.cluster.local","port": "443"},"authentication": {"role": "hawkular","auth_key": "{{ management_infra_token.stdout }}"}}]}'
   tags:
-     - configcloudforms
-     - createproviderscloudforms 
-
+       - install
+       - configcloudforms
+       - createproviderscloudforms 
+       
 - name: Adding Ansible Tower Provider to CloudForms
   uri:
     method: POST
@@ -183,9 +184,26 @@
     password: "{{ cloudforms_password }}"
     force_basic_auth: yes
     status_code: 200
-    body: '{"type":"ManageIQ::Providers::AnsibleTower::Provider","name":"Ansible Tower 3","url":"http://tower.{{ ansibletower_namespace }}.svc.cluster.local/api/v1","credentials": {"userid":"{{ ansibletower_username }}","password":"{{ ansibletower_password }}"}}'
+    body: '{"type":"ManageIQ::Providers::AnsibleTower::Provider","name":"Ansible Tower 3","url":"http://towerweb.ansible-tower.svc.cluster.local/api/v1","credentials": {"userid":"admin","password":"password"}}'
   tags:
-     - cloudforms
-     - configcloudforms
-     - createproviderscloudforms
-     - cloudforms_tower
+       - install
+       - configcloudforms
+       - createproviderscloudforms
+
+- name: Adding Service Catalog to CloudForms
+  uri:
+    method: POST
+    body_format: json
+    HEADER_Content-Type: application/json
+    validate_certs: no
+    return_content: yes
+    url: "{{ cloudforms_full_url }}/api/service_catalogs"
+    user: "{{ cloudforms_username }}"
+    password: "{{ cloudforms_password }}"
+    force_basic_auth: yes
+    status_code: 200
+    body: '{"action": "create","resource": {"name": "Ansible Tower Service Catalog","description": "Run Job Templates via Ansible Tower Service Catalog"}}'
+  tags:
+       - install
+       - configcloudforms
+       - createcatalogscloudforms
