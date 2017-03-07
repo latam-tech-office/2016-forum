@@ -66,7 +66,7 @@ parameters:
     account 'admin' will be initialized with the password 'password'.
   displayName: Enable OAuth in Jenkins
   name: ENABLE_OAUTH
-  value: "true"
+  value: "false"
 - description: Maximum amount of memory the container can use.
   displayName: Memory Limit
   name: MEMORY_LIMIT

@@ -36,6 +36,24 @@
   tags: 
      - tooling  
 
+- name: Wait for Postgresql for Gogs to be Create
+  command: oc get pods --output jsonpath='{$..spec.containers[?(@.name=="postgresql")]}' --namespace {{ tooling_namespace }}
+  register: gogs_postgresql_create
+  until: gogs_postgresql_create.rc == 0
+  retries: 60
+  delay: 10
+  tags:
+     - tooling
+
+- name: Wait for Postgresql for Gogs to be Ready
+  command: oc get pods --output jsonpath='{.items[?(@.spec.containers[*].name=="postgresql")].status.conditions[?(@.type=="Ready")].status}' --namespace {{ tooling_namespace }}
+  register: gogs_postgresql_wait
+  until: "{{ 'True' in gogs_postgresql_wait.stdout }}"
+  retries: 60
+  delay: 10
+  tags:
+     - tooling
+
 - name: Wait Gogs settles down a while
   pause: seconds=60
   tags: 
@@ -111,7 +129,7 @@
 - name: Add a WebHook to Jenkins
   uri: method=POST body_format=json url="{{ gogs_url }}/api/v1/repos/{{ username }}/brms/hooks"
        user={{ username }} password={{ password }} force_basic_auth=yes
-       body="{\"type\"{{ ":" }}\"gogs\",\"config\"{{ ":" }}{\"url\"{{ ":" }}\"http://admin:{{ password }}@jenkins:80/job/forum-pipeline/build?delay=0sec\",\"content_type\"{{ ":" }}\"json\"},\"events\"{{ ":" }}[\"push\"],\"active\"{{ ":" }}true}"
+       body="{\"type\"{{ ":" }}\"gogs\",\"config\"{{ ":" }}{\"url\"{{ ":" }}\"http://admin:password@jenkins:80/job/tooling-forum-pipeline/build?delay=0sec\",\"content_type\"{{ ":" }}\"json\"},\"events\"{{ ":" }}[\"push\"],\"active\"{{ ":" }}true}"
   register: json_result
   failed_when: json_result.status != 201
   tags: 
