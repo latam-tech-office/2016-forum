@@ -130,7 +130,7 @@
     password: "{{ cloudforms_password }}"
     force_basic_auth: yes
     status_code: 200
-    body: '{"name": "Forum Admin","userid": "{{ username }}","password": "{{ password }}","email": "{{ username }}@{{ openshift_domain }}","group": {"id": 1000000000002}}'
+    body: '{"name": "Demo Admin","userid": "{{ username }}","password": "{{ password }}","email": "{{ username }}@{{ openshift_domain }}","group": {"id": 1000000000002}}'
   tags:
        - cloudforms
        - configcloudforms
@@ -220,7 +220,7 @@
     password: "{{ cloudforms_password }}"
     force_basic_auth: yes
     status_code: 200
-    body: '{"action": "create","resource": {"name": "Ansible Tower Service Catalog","description": "Run Job Templates via Ansible Tower Service Catalog"}}'
+    body: '{"action": "create","resource": {"name": "OpenShift Catalog","description": "OpenShift Service Catalog"}}'
   tags:
        - cloudforms
        - configcloudforms
