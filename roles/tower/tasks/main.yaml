@@ -89,22 +89,22 @@
      - create
      - tower
 
-- name: Create Persistent Volume Claims for Ansible Tower (/var and /etc/tower)
-  command: oc create --filename=templates/ansibletower-persistentvolumeclaims.yaml --namespace {{ ansibletower_namespace }}
-  tags:
-     - create
-     - tower
-     - persistentvolume
+#- name: Create Persistent Volume Claims for Ansible Tower (/var and /etc/tower)
+#  command: oc create --filename=templates/ansibletower-persistentvolumeclaims.yaml --namespace {{ ansibletower_namespace }}
+#  tags:
+#     - create
+#     - tower
+#     - persistentvolume
 
-- name: Create persistentvolumes into Deploymentconfig
-  command: oc volume deploymentconfig/tower --name={{ item.name }} --add --mount-path={{ item.directory }} --claim-name={{ item.claim }} --namespace {{ ansibletower_namespace }} 
-  with_items:
-     - { "name": "tower-data",          "directory": "/var",       "claim":"tower-data" }
-     - { "name": "tower-configuration", "directory": "/etc/tower", "claim":"tower-configuration" }
-  tags:
-     - create
-     - tower  
-     - persistentvolume
+#- name: Create persistentvolumes into Deploymentconfig
+#  command: oc volume deploymentconfig/tower --name={{ item.name }} --add --mount-path={{ item.directory }} --claim-name={{ item.claim }} --namespace {{ ansibletower_namespace }} 
+#  with_items:
+#     - { "name": "tower-data",          "directory": "/var",       "claim":"tower-data" }
+#     - { "name": "tower-configuration", "directory": "/etc/tower", "claim":"tower-configuration" }
+#  tags:
+#     - create
+#     - tower  
+#     - persistentvolume
          
 - name: Patch the DeploymentConfig to allow Privileged Containers
   command: oc patch deploymentconfig/tower --patch '{"spec"{{ ':' }}{"template"{{ ':' }}{"spec"{{ ':' }} {"containers"{{ ':' }} [{"name"{{ ':' }}"tower","securityContext"{{ ':' }} {"privileged"{{ ':' }} true}} ],"serviceAccountName"{{ ':' }}"satower"}}}}' --namespace {{ ansibletower_namespace }}
@@ -137,11 +137,13 @@
   failed_when: ansible_tower_port.rc != 0
   tags:
      - tower
+     - configtower
          
 - set_fact: tower_port={{ ansible_tower_port.stdout }}
   when: '{{ "rcalvaga" not in ansibletower_dockerimage }}'
   tags:
      - tower
+     - configtower
          
 - name: Fetch Ansible Tower port (Robert's Docker Image)
   command: oc get service/tower --output jsonpath='{..spec.ports.*.port}' --namespace {{ ansibletower_namespace }}
@@ -150,16 +152,19 @@
   failed_when: ansible_tower_port.rc != 0
   tags:
      - tower
+     - configtower
          
 - set_fact: tower_port={{ ansible_tower_port.stdout }}
   when: '{{ "rcalvaga" in ansibletower_dockerimage }}'
   tags:
      - tower
+     - configtower
          
 - name: Define Ansible Tower URL
   set_fact: ansible_tower_url='https://tower.{{ ansibletower_namespace }}.svc.cluster.local:{{ tower_port }}'
   tags: 
      - tower
+     - configtower
          
 - name: Wait for Ansible Tower to be up{{ ':' }} {{ ansible_tower_url }}
   uri: url="{{ ansible_tower_url }}" validate_certs=no status_code=200 
@@ -169,6 +174,7 @@
   delay: 10
   tags: 
      - tower
+     - configtower
          
 - set_fact: license_content={{ lookup('file', '{{ ansibletower_license_file }}') }}
   tags:
@@ -201,7 +207,7 @@
     force_basic_auth: yes 
     validate_certs: no 
     return_content: yes
-    body: '{"username": "{{ username }}","first_name": "Demo","last_name": "Demo","email": "demo@{{ openshift_domain }}","is_superuser": false,"is_system_auditor": false,"password": "{{ password }}"}'
+    body: '{"username": "{{ username }}","first_name": "Demo","last_name": "Demo","email": "{{ username }}@{{ openshift_domain }}","is_superuser": false,"is_system_auditor": false,"password": "{{ password }}"}'
   tags: 
      - tower
      - configtower
