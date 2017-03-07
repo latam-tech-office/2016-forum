@@ -67,10 +67,10 @@ cloudforms_http_type: https
 ###   ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER ANSIBLE TOWER
 ansibletower_namespace: ansible-tower
 #ansibletower_dockerimage: rcalvaga/rhel7_ansible_tower
-ansibletower_dockerimage: ybalt/ansible-tower
+ansibletower_dockerimage: jbla/ansible-tower
 ansibletower_license_file: license_b4451138a0004212ac8476cc275a08e9.txt
 ansibletower_username: admin
-ansibletower_password: 000
+ansibletower_password: password
 ansibletower_web_service: towerweb
 ansibletower_openshift_master: master.{{ openshift_domain }}
 
