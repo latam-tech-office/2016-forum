@@ -166,7 +166,7 @@
     password: "{{ cloudforms_password }}"
     force_basic_auth: yes
     status_code: 200
-    body: '{"type":"ManageIQ::Providers::OpenshiftEnterprise::ContainerManager","tenant_id":1000000000002,"name":"OpenShift 3.4 Container Platform","connection_configurations" : [{"endpoint": {"role": "default","hostname":"openshift.default.svc.cluster.local","port":"443"},"authentication": {"role": "bearer","auth_key": "{{ management_infra_token.stdout }}"}},{"endpoint": {"role": "hawkular","hostname":"hawkular-metrics.openshift-infra.svc.cluster.local","port": "443"},"authentication": {"role": "hawkular","auth_key": "{{ management_infra_token.stdout }}"}}]}'
+    body: '{"type":"ManageIQ::Providers::OpenshiftEnterprise::ContainerManager","name":"OpenShift 3.4 Container Platform","connection_configurations" : [{"endpoint": {"role": "default","hostname":"openshift.default.svc.cluster.local","port":"443"},"authentication": {"role": "bearer","auth_key": "{{ management_infra_token.stdout }}"}},{"endpoint": {"role": "hawkular","hostname":"hawkular-metrics.openshift-infra.svc.cluster.local","port": "443"},"authentication": {"role": "hawkular","auth_key": "{{ management_infra_token.stdout }}"}}]}'
   tags:
        - install
        - configcloudforms
