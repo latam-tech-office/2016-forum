@@ -13,6 +13,11 @@
   tags:
      - tooling  
 
+- name: Allow anyone from this Namespace to access pods in namespace {{ microservices_namespace }}
+  command: oadm policy add-role-to-user edit system:serviceaccount:{{ tooling_namespace }}:jenkins ----namespace {{ microservices_namespace }}
+  tags:
+     - tooling
+
 - set_fact: gogs_url="http{{ ':' }}//gogs.{{ tooling_namespace }}.svc.cluster.local:3000"
   tags:
      - tooling
