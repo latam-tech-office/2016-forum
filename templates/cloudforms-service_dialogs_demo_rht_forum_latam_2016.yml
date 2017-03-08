@@ -1,0 +1,296 @@
+---
+- description: Delete Red Hat Forum LATAM 2016 Demo Apps
+  buttons: submit,cancel
+  label: OpenShift - Delete RHT Forum LATAM 2016 Apps
+  dialog_tabs:
+  - description: 
+    display: edit
+    label: Basic Information
+    display_method: 
+    display_method_options: 
+    position: 0
+    dialog_groups:
+    - description: 
+      display: edit
+      label: Extra Variables
+      display_method: 
+      display_method_options: 
+      position: 0
+      dialog_fields:
+      - name: param_project_name
+        description: Project Name
+        type: DialogFieldTextBox
+        data_type: string
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: forum-prod
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+        label: Project Name
+        position: 0
+        validator_type: 
+        validator_rule: 
+        reconfigurable: true
+        dynamic: 
+        show_refresh_button: 
+        load_values_on_init: 
+        read_only: true
+        auto_refresh: 
+        trigger_auto_refresh: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+- description: Create Red Hat Forum LATAM 2016 Demo Apps
+  buttons: submit,cancel
+  label: OpenShift - Create RHT Forum LATAM 2016 Apps
+  dialog_tabs:
+  - description: 
+    display: edit
+    label: Basic Information
+    display_method: 
+    display_method_options: 
+    position: 0
+    dialog_groups:
+    - description: 
+      display: edit
+      label: Extra Variables
+      display_method: 
+      display_method_options: 
+      position: 0
+      dialog_fields:
+      - name: param_project_name
+        description: Project Name
+        type: DialogFieldTextBox
+        data_type: string
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: forum-prod
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+        label: Project Name
+        position: 0
+        validator_type: 
+        validator_rule: 
+        reconfigurable: true
+        dynamic: 
+        show_refresh_button: 
+        load_values_on_init: 
+        read_only: true
+        auto_refresh: 
+        trigger_auto_refresh: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+      - name: param_demo_environment
+        description: Environment
+        type: DialogFieldTextBox
+        data_type: string
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: Prod
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+        label: Environment
+        position: 1
+        validator_type: 
+        validator_rule: 
+        reconfigurable: true
+        dynamic: 
+        show_refresh_button: 
+        load_values_on_init: 
+        read_only: true
+        auto_refresh: 
+        trigger_auto_refresh: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+      - name: param_demo_user
+        description: OSE User
+        type: DialogFieldTextBox
+        data_type: string
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: demo
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+        label: OSE User
+        position: 2
+        validator_type: 
+        validator_rule: 
+        reconfigurable: true
+        dynamic: 
+        show_refresh_button: 
+        load_values_on_init: 
+        read_only: true
+        auto_refresh: 
+        trigger_auto_refresh: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+      - name: param_app_template
+        description: Application Template
+        type: DialogFieldTextBox
+        data_type: string
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: forum-apps
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+        label: Application Template
+        position: 3
+        validator_type: 
+        validator_rule: 
+        reconfigurable: true
+        dynamic: false
+        show_refresh_button: 
+        load_values_on_init: 
+        read_only: true
+        auto_refresh: 
+        trigger_auto_refresh: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+      - name: param_tooling_user
+        description: Tooling User
+        type: DialogFieldTextBox
+        data_type: string
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: tooling
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+        label: Tooling User
+        position: 4
+        validator_type: 
+        validator_rule: 
+        reconfigurable: true
+        dynamic: false
+        show_refresh_button: 
+        load_values_on_init: 
+        read_only: true
+        auto_refresh: 
+        trigger_auto_refresh: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+      - name: param_cicd_user
+        description: CICD User
+        type: DialogFieldTextBox
+        data_type: string
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: cicd
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+        label: CICD User
+        position: 5
+        validator_type: 
+        validator_rule: 
+        reconfigurable: true
+        dynamic: false
+        show_refresh_button: 
+        load_values_on_init: 
+        read_only: true
+        auto_refresh: 
+        trigger_auto_refresh: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
