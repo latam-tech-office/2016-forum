@@ -14,7 +14,7 @@
      - tooling  
 
 - name: Allow anyone from this Namespace to access pods in namespace {{ microservices_namespace }}
-  command: oadm policy add-role-to-user edit system:serviceaccount:{{ tooling_namespace }}:jenkins --namespace {{ microservices_namespace }}
+  command: oadm policy add-role-to-user edit system:serviceaccount:{{ tooling_namespace }}:jenkins --serviceaccount default
   tags:
      - tooling
 

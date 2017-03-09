@@ -35,7 +35,7 @@
      - microservices
 
 - name: Allow this Namespace{{ ':' }} {{ tooling_namespace }} to 'edit' pods in Namespace{{ ':' }} {{ microservices_namespaces }}
-  command: oadm policy add-role-to-user edit system:serviceaccount:{{ tooling_namespace }}:default --namespace {{ microservices_namespace }}
+  command: oadm policy add-role-to-user edit system:serviceaccount:{{ tooling_namespace }}:jenkins --namespace {{ microservices_namespace }}
   tags: 
      - microservices
 
