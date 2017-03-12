@@ -21,6 +21,7 @@
 - set_fact: gogs_url="http{{ ':' }}//gogs.{{ tooling_namespace }}.svc.cluster.local:3000"
   tags:
      - tooling
+     - config_tooling
 
 - name: Creating all the necessary applications based on a OpenShift's template
   command: oc new-app --file=templates/tooling-template.yaml --param=GOGS_USERNAME={{ username }} --param=GOGS_PASSWORD={{ password }} --param=CLOUDAPPS_DOMAIN={{ openshift_cloudapps_domain }} --param=CLOUDAPPS_NAMESPACE={{ tooling_namespace }} --param=GOGS_URL={{ gogs_url }} --param=MICROSERVICES_NAMESPACE={{ microservices_namespace }} --namespace {{ tooling_namespace }}
@@ -40,6 +41,7 @@
   delay: 10
   tags: 
      - tooling  
+     - config_tooling
 
 - name: Wait for Postgresql for Gogs to be Create
   command: oc get pods --output jsonpath='{$..spec.containers[?(@.name=="postgresql")]}' --namespace {{ tooling_namespace }}
@@ -49,6 +51,7 @@
   delay: 10
   tags:
      - tooling
+     - config_tooling
 
 - name: Wait for Postgresql for Gogs to be Ready
   command: oc get pods --output jsonpath='{.items[?(@.spec.containers[*].name=="postgresql")].status.conditions[?(@.type=="Ready")].status}' --namespace {{ tooling_namespace }}
@@ -58,46 +61,54 @@
   delay: 10
   tags:
      - tooling
+     - config_tooling
 
 - name: Wait Gogs settles down a while
   pause: seconds=60
   tags: 
      - tooling
+     - config_tooling
          
 - name: Retrieving Gogs Database's Username
   command: oc get deploymentconfig/postgresql-gogs -o jsonpath="{.spec.template.spec.containers[*].env[?(@.name==\"POSTGRESQL_USER\")].value}" --namespace {{ tooling_namespace }}
   register: gogs_database_username
   tags: 
      - tooling
+     - config_tooling
          
 - name: Retrieving Gogs Database's Password
   command: oc get deploymentconfig/postgresql-gogs -o jsonpath="{.spec.template.spec.containers[*].env[?(@.name==\"POSTGRESQL_PASSWORD\")].value}" --namespace {{ tooling_namespace }}
   register: gogs_database_password
   tags: 
      - tooling
+     - config_tooling
          
 - name: Retrieving Gogs Database's Name
   command: oc get deploymentconfig/postgresql-gogs -o jsonpath="{.spec.template.spec.containers[*].env[?(@.name==\"POSTGRESQL_DATABASE\")].value}" --namespace {{ tooling_namespace }}
   register: gogs_database_name
   tags: 
      - tooling  
+     - config_tooling
 
 - name: Retrieving Gogss Database's IP
   command: oc get service/postgresql-gogs --output template --template "{{ '{{' }}.spec.clusterIP{{ '}}' }}" --namespace {{ tooling_namespace }}
   register: gogs_database_ip
   tags: 
      - tooling
+     - config_tooling
          
 - name: Retrieving Gog's Port Number
   command: oc get service/postgresql-gogs --output jsonpath="{.spec.ports.*.port}" --namespace {{ tooling_namespace }}
   register: gogs_database_port
   tags: 
      - tooling
+     - config_tooling
 
 - name: Define Gogs's Address to use during installation
   set_fact: gogs_address="http{{ ':' }}//gogs.{{ openshift_cloudapps_domain }}/"
   tags: 
      - tooling
+     - config_tooling
  
 - name: Installing Gogs for the very first time
   uri: method=POST HEADER_Content-type="application/x-www-form-urlencoded" url="{{ gogs_url }}/install"
@@ -106,6 +117,7 @@
   failed_when: result_install.status != 302
   tags: 
      - tooling
+     - config_tooling
 
 - name: Import into BRMS Content
   uri: method=POST body_format=json url={{ gogs_url }}/api/v1/repos/migrate
@@ -118,6 +130,7 @@
   tags: 
      - tooling
      - installbrms
+     - config_tooling
 
 - name: Import into Forum Content
   uri: method=POST body_format=json url={{ gogs_url }}/api/v1/repos/migrate
@@ -130,6 +143,7 @@
   tags: 
      - tooling
      - installforum
+     - config_tooling
 
 - name: Add a WebHook to Jenkins
   uri: method=POST body_format=json url="{{ gogs_url }}/api/v1/repos/{{ username }}/brms/hooks"
@@ -140,6 +154,7 @@
   tags: 
      - tooling
      - installwebhook
+     - config_tooling
 
 - name: Fetch Nexus Port
   command: oc get service/nexus --output jsonpath='{..spec.ports[?(@.name=="web")].port}' --namespace {{ tooling_namespace }}
@@ -149,6 +164,7 @@
      - tooling
      - toolingnexus
      - toolingnexus6
+     - config_tooling
 
 - name: Define the address to reach Nexus. Hardcoded Username{{ ':' }}admin, Password{{ ':' }}admin123
   set_fact: nexus_url="http{{ ':' }}//admin:admin123@nexus.{{ tooling_namespace }}.svc.cluster.local{{ ':' }}{{ nexus_port.stdout }}"
@@ -156,6 +172,7 @@
      - tooling
      - toolingnexus
      - toolingnexus6
+     - config_tooling
 
 - name: Wait for Nexus to be ready{{ ":" }} {{ nexus_url }}
   uri: url="{{ nexus_url }}" status_code=200 
@@ -166,11 +183,13 @@
   tags:
      - tooling
      - toolingnexus
+     - config_tooling
 
 - name: Wait Nexus settles down a while
   pause: seconds=60
   tags: 
      - tooling
+     - config_tooling
 
 - name: Adding a Repository into Nexus {{ '#' }}1
   uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"  status_code=201
@@ -178,6 +197,7 @@
   tags:
      - tooling
      - toolingnexus
+     - config_tooling
 
 - name: Adding a Repository into Nexus {{ '#' }}2
   uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"     status_code=201
@@ -185,6 +205,7 @@
   tags:
      - tooling 
      - toolingnexus
+     - config_tooling
 
 - name: Adding a Repository into Nexus {{ '#' }}3
   uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"     status_code=201
@@ -192,6 +213,7 @@
   tags:
      - tooling
      - toolingnexus
+     - config_tooling
 
 - name: Adding a Repository into Nexus {{ '#' }}4
   uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"     status_code=201
@@ -199,6 +221,7 @@
   tags:
      - tooling
      - toolingnexus
+     - config_tooling
 
 - name: Adding a Repository into Nexus {{ '#' }}5
   uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repositories"      status_code=201
@@ -206,6 +229,7 @@
   tags:
      - tooling
      - toolingnexus
+     - config_tooling
 
 - name: Adding a Repo Groups into Nexus {{ '#' }}6
   uri: method=POST HEADER_Content-type="application/xml" url="{{ nexus_url }}/service/local/repo_groups" status_code=201
@@ -213,3 +237,4 @@
   tags:
      - tooling
      - toolingnexus
+     - config_tooling

@@ -30,7 +30,7 @@
        - { pv_index: 23, "type": "large",   pv_size: 25 }
        - { pv_index: 24, "type": "large",   pv_size: 25 }
        - { pv_index: 25, "type": "large",   pv_size: 25 }
-    nfs_server: 192.168.0.100
+    nfs_server: 192.168.56.100
     nfs_path_prefix: /var/storage/local
   tasks:
     - name: Create directory for NFS Exports

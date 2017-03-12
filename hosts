@@ -1,4 +1,2 @@
 [openshift-hosts]
-master.example.com
-infra.example.com
-node[1:6].example.com
+openshift.example.com
