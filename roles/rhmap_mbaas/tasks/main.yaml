@@ -32,8 +32,15 @@
      - rhmap
      - rhmap_mbaas
 
-- name: "Create the MBaaS Resources" 
-  command: "oc new-app --file {{ rhmap_directory_rhmap }}/mbaas/fh-mbaas-template-1node.json --namespace {{ rhmap_project_mbaas }}"
+#- name: "Create the MBaaS Resources, using 3 Nodes" 
+#  command: "oc new-app --file {{ rhmap_directory_rhmap }}/mbaas/fh-mbaas-template-3node.json --namespace {{ rhmap_project_mbaas }}"
+#  tags:
+#     - mbaas
+#     - rhmap
+#     - rhmap_mbaas
+
+- name: "Create the MBaaS Resources, using 3 Nodes"
+  command: "oc new-app --file templates/rhmap/fh-mbaas-template-3node.json --namespace {{ rhmap_project_mbaas }}"
   tags:
      - mbaas
      - rhmap
