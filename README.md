@@ -1,3 +1,20 @@
+<h1>LATAM Red Hat Forum 2016 Demo</h1>
+This is demo shown during LATAM Red Hat Forum 2016 featuring several applications from Red Hat portfolio, bringing a some possible scenarios over a booking in Travel Agency. In order to get this application up-and-running, it's important that you have latest version of <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> with minimum of 6 Nodes and some Persistence Storage avaible [PENDING: Description of Persistence Storage].
+
+## Before running the installer, please make sure
+
+1. You need to be OpenShift's System Administrator in order to run this installer.
+    ```
+    # oc login --username=system:admin
+    Logged into "https://master.example.com:8443" as "system:admin" using existing credentials.
+    ```
+
+2. Makre sure if you've got some Persistent Volume (PV) available for your cluster
+
+
+
+
+
 Step #1: Make sure all your Openshift's hosts is registered using subscription manager
 # subscription-manager status
 +-------------------------------------------+
