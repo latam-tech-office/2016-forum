@@ -1,12 +1,14 @@
-<h1>LATAM Red Hat Forum 2016 Demo</h1>
+<h1><a href="https://www.gitbook.com/book/latam-tech-office/forumdemo">LATAM Red Hat Forum 2016 Demo</a></h1>
 This is demo shown during LATAM Red Hat Forum 2016 featuring several applications from Red Hat portfolio by delivering an ficticious Travel Agency scenario. Every application here runs in a container on top of <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> with minimum of 6 Nodes and some Persistence Storage avaible.
 
+A detail instructions of how every application works, troubleshooting and more is available here: <a href="https://www.gitbook.com/book/latam-tech-office/forumdemo"/>
+
 ## Before running the installer, please make sure
-Note: A installer called here it's a Ansible Playbook with a set of instructions based on a inventory file (hosts). 
+<h4><b>Note:</b> A installer called here it's a Ansible Playbook with a set of instructions based on a inventory file (hosts).</h4> 
 
-1. You need an OpenShift Container Platform (latest version possible) available at your disposal with *minimum* of 6 Nodes, with a user created named 'demo'. (if you do want to use a different user, please look at step 8).
+1. You need an <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> (latest version possible) available at your disposal with *minimum* of 6 Nodes, with a user created named 'demo'. (if you do want to use a different user, please look at step 9).
 
-2. It's important that inside of your OpenShit's Cluster installation be able to resolve "cloudapps" domain.
+2. It's important that inside of yours <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> installation be able to resolve "cloudapps" domain.
 
     ```
     # nslookup testing.cloudapps.example.com
@@ -18,11 +20,11 @@ Note: A installer called here it's a Ansible Playbook with a set of instructions
     Address: 208.84.244.112
     ```
 
-If that doesn't work, RHMAP will definitely fail. 
+    If that doesn't work, RHMAP will definitely fail. 
 
-3. You need an active Red Hat Subscription (ideally so called Employee SKU) applied to all hosts which allows you to download all the necessary products.
+3. You need an active Red Hat Subscription (ideally an Employee SKU) applied to all hosts which allows you to download all the necessary products.
 
-4. You need to be OpenShift's System Administrator in order to run this installer.
+4. You need to be <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift</a> System Administrator in order to run this installer.
     ```
     # oc login --username=system:admin
     Logged into "https://master.example.com:8443" as "system:admin" using existing credentials.
@@ -30,7 +32,7 @@ If that doesn't work, RHMAP will definitely fail.
 
 The installer needs Administratives privileges in order to create and setup all the necessary permissions for each application.
 
-5. You need som Persistence Volume (or PV) available at yours OpenShift's Cluster:
+5. You need som Persistence Volume (or PV) available at yours <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Cluster's</a>:
     ```
     # oc get pv
     NAME                  CAPACITY   ACCESSMODES   RECLAIMPOLICY   STATUS      CLAIM                                REASON    AGE
@@ -44,7 +46,7 @@ The installer needs Administratives privileges in order to create and setup all 
     .
     ```
 
-In case you don't have Persisent Volumes available at your OpenShift's Cluster, you're providing another playbook that it will create some Persistent Volumes at your OpenShift's Master using NFS. Again, you need root access to your host in order to be able to run this Ansible's playbook. Just type:
+    In case you don't have Persisent Volumes available at your <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift's Cluster</a>, we're providing another playbook that it will create some Persistent Volumes at your <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift's Master</a> using NFS. Again, you need root access at your host in order to be able to run this Ansible's playbook. Just type:
 
     ```
     # ./create_persistentvolumes.yaml
@@ -67,7 +69,7 @@ In case you don't have Persisent Volumes available at your OpenShift's Cluster, 
 6. You need to download an <a href="https://www.ansible.com/tower">Ansible Tower</a> license and leave it at the same directory as the installer: <b>/2016-forum</b>
    The file should look like: <b>license_b4451138a1234212ac8476cc756a08e9.txt</b>
 
-7. You need to download 3 jar files needed by Business Central and copy then into the folder: /2016-forum/templates/rhcs-bc/installs/
+7. You need to download 3 jar files needed by Business Central and copy then into the folder: <b>/2016-forum/templates/rhcs-bc/installs/</b>
    The files are:
 
    File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=37383">jboss-eap-6.4.0-installer.jar</a>:   
@@ -79,7 +81,7 @@ In case you don't have Persisent Volumes available at your OpenShift's Cluster, 
    File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631">jboss-brms-6.3.0.GA-installer.jar</a>
    <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631">https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631</a>
 
-8. Check the file <b>/2016-forum/hosts</b> and it should match all your hosts of your cluster. In this example, there is a OpenShift's Cluster with 8 hosts named: master.example.com, infra.example.com, node1.example.com, node2.example.com, node3.example.com, node4.example.com, node5.example.com and node6.example.com.
+8. Check the file <b>/2016-forum/hosts</b> and it should match all your hosts of your cluster. In this example, there is a <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift's Cluster</a> with 8 hosts named: master.example.com, infra.example.com, node1.example.com, node2.example.com, node3.example.com, node4.example.com, node5.example.com and node6.example.com.
 
     ```
     # cat hosts
