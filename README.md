@@ -1,7 +1,7 @@
 <h1><a href="https://www.gitbook.com/book/latam-tech-office/forumdemo">LATAM Red Hat Forum 2016 Demo</a></h1>
 This is a demo shown during LATAM Red Hat Forum 2016 featuring several applications from Red Hat portfolio by delivering an ficticious Travel Agency scenario. Every application here runs in a container on top of <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> with minimum of 6 Nodes and some Persistence Storage avaible.<br/>
 
-A detail instructions of how every application works, troubleshooting and more is available here: <a href="https://www.gitbook.com/book/latam-tech-office/forumdemo">https://www.gitbook.com/book/latam-tech-office/forumdemo</a>
+<h2><a href="https://www.gitbook.com/book/latam-tech-office/forumdemo">A detail instructions of how every application works, troubleshooting and more is available</a></h2>
 
 ## Before running the installer, please make sure
 <h4><b>Note:</b> A installer called here it's a Ansible Playbook with a set of instructions based on a inventory file (hosts).</h4> 
