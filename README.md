@@ -1,5 +1,5 @@
 <h1><a href="https://www.gitbook.com/book/latam-tech-office/forumdemo">LATAM Red Hat Forum 2016 Demo</a></h1>
-This is a demo shown during <a href="https://www.redhat.com/en/about/events">LATAM Red Hat Forum 2016</a> featuring several applications from Red Hat portfolio by delivering an ficticious Travel Agency scenario. Every application here runs in a container on top of <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> with minimum of 6 Nodes and some Persistence Storage avaible.<br/>
+This is a demo shown during <a href="https://www.redhat.com/en/about/events">LATAM Red Hat Forum 2016</a> featuring several applications from Red Hat portfolio by delivering an ficticious Travel Agency scenario. Every application here runs in a container on top of <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> with minimum of 6 Nodes, all data will be persisted after reboots.<br/>
 
 <h2><a href="https://www.gitbook.com/book/latam-tech-office/forumdemo">A detail instructions of how every application works, troubleshooting and more is available</a></h2>
 
@@ -88,7 +88,7 @@ After installation, you're going to get an environment with the following applic
    File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43071">jboss-eap-6.4.7-patch.zip</a>        
    <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43071">https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43071</a>
 
-   File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631">jboss-brms-6.3.0.GA-installer.jar</a>
+   File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631">jboss-brms-6.3.0.GA-installer.jar</a>         
    <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631">https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631</a>
 
 8. Check the file <b>/2016-forum/hosts</b> and it should match all your hosts of your cluster. In this example, there is a <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift's Cluster</a> with 8 hosts named: <i>master.example.com, infra.example.com, node1.example.com, node2.example.com, node3.example.com, node4.example.com, node5.example.com and node6.example.com.</i>
