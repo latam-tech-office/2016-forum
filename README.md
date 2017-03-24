@@ -1,14 +1,28 @@
 <h1>LATAM Red Hat Forum 2016 Demo</h1>
-This is demo shown during LATAM Red Hat Forum 2016 featuring several applications from Red Hat portfolio, bringing a some possible scenarios over a booking in Travel Agency. In order to get this application up-and-running, it's important that you have latest version of <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> with minimum of 6 Nodes and some Persistence Storage avaible [PENDING: Description of Persistence Storage].
+This is demo shown during LATAM Red Hat Forum 2016 featuring several applications from Red Hat portfolio by delivering an ficticious Travel Agency scenario. Every application here runs in a container on top of <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> with minimum of 6 Nodes and some Persistence Storage avaible.
 
 ## Before running the installer, please make sure
 Note: A installer called here it's a Ansible Playbook with a set of instructions based on a inventory file (hosts). 
 
 1. You need an OpenShift Container Platform (latest version possible) available at your disposal with *minimum* of 6 Nodes, with a user created named 'demo'. (if you do want to use a different user, please look at step 8).
 
-2. You need an active Red Hat Subscription (ideally so called Employee SKU) applied to all hosts which allows you to download all the necessary products.
+2. It's important that inside of your OpenShit's Cluster installation be able to resolve "cloudapps" domain.
 
-3. You need to be OpenShift's System Administrator in order to run this installer.
+    ```
+    # nslookup testing.cloudapps.example.com
+    Server:	8.8.8.8
+    Address:	8.8.8.8#53
+
+    Non-authoritative answer:
+    Name:	terra.com.br
+    Address: 208.84.244.112
+    ```
+
+If that doesn't work, RHMAP will definitely fail. 
+
+3. You need an active Red Hat Subscription (ideally so called Employee SKU) applied to all hosts which allows you to download all the necessary products.
+
+4. You need to be OpenShift's System Administrator in order to run this installer.
     ```
     # oc login --username=system:admin
     Logged into "https://master.example.com:8443" as "system:admin" using existing credentials.
@@ -16,7 +30,7 @@ Note: A installer called here it's a Ansible Playbook with a set of instructions
 
 The installer needs Administratives privileges in order to create and setup all the necessary permissions for each application.
 
-4. You need som Persistence Volume (or PV) available at yours OpenShift's Cluster:
+5. You need som Persistence Volume (or PV) available at yours OpenShift's Cluster:
     ```
     # oc get pv
     NAME                  CAPACITY   ACCESSMODES   RECLAIMPOLICY   STATUS      CLAIM                                REASON    AGE
@@ -50,17 +64,22 @@ In case you don't have Persisent Volumes available at your OpenShift's Cluster, 
 
     ```
 
-5. You need to download an <a href="https://www.ansible.com/tower">Ansible Tower</a> license and leave it at the same directory as the installer: /2016-forum
-   The file should look like: license_b4451138a1234212ac8476cc756a08e9.txt
+6. You need to download an <a href="https://www.ansible.com/tower">Ansible Tower</a> license and leave it at the same directory as the installer: <b>/2016-forum</b>
+   The file should look like: <b>license_b4451138a1234212ac8476cc756a08e9.txt</b>
 
-6. You need to download 3 jar files needed by Business Central and copy then into the folder: /2016-forum/templates/rhcs-bc/installs/
+7. You need to download 3 jar files needed by Business Central and copy then into the folder: /2016-forum/templates/rhcs-bc/installs/
    The files are:
 
-   File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=37383">jboss-eap-6.4.0-installer.jar</a>:   :  https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=37383
-   File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43071">jboss-eap-6.4.7-patch.zip</a>        :  https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43071
-   File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631">jboss-brms-6.3.0.GA-installer.jar</a>:  https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631
+   File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=37383">jboss-eap-6.4.0-installer.jar</a>:   
+   <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=37383">https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=37383</a>
 
-7. Check the file /2016-forum/hosts and it should match all your hosts of your cluster. In this example, there is a OpenShift's Cluster with 8 hosts named: master.example.com, infra.example.com, node1.example.com, node2.example.com, node3.example.com, node4.example.com, node5.example.com and node6.example.com.
+   File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43071">jboss-eap-6.4.7-patch.zip</a>        
+   <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43071>https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43071</a>
+
+   File <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631">jboss-brms-6.3.0.GA-installer.jar</a>
+   <a href="https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631">https://access.redhat.com/jbossnetwork/restricted/softwareDownload.html?softwareId=43631</a>
+
+8. Check the file <b>/2016-forum/hosts</b> and it should match all your hosts of your cluster. In this example, there is a OpenShift's Cluster with 8 hosts named: master.example.com, infra.example.com, node1.example.com, node2.example.com, node3.example.com, node4.example.com, node5.example.com and node6.example.com.
 
     ```
     # cat hosts
@@ -72,7 +91,7 @@ In case you don't have Persisent Volumes available at your OpenShift's Cluster, 
 
     Adjust this file accordingly.
 
-8. Check the file /2016-forum/group_vars/all which contains most of the variables necessary to setup all applications. Modfied any information to suit your needs. For example, all applications will be installed for user 'demo'. If you want to be installed on a different user, change the property "username" on this file. 
+9. Check the file <b>/2016-forum/group_vars/all</b> which contains most of the variables necessary to setup all applications. Modfied any information to suit your needs. For example, all applications will be installed for user 'demo'. If you want to be installed on a different user, change the property "username" on this file. 
 
    
 ## When you've done all that
@@ -125,95 +144,4 @@ There is a chance that some installation might fail. In that case, you might wan
     .
 
     ```
-
-
-
-
-
-
-
-
-This is important, because we're going to need to add some repositories for RHMAP
-
-
-
-Step #2 Be sure to have a 'demo' user available in your OpenShift installation
-
-
-Step #3: Be sure to provide some Persistent Volumes with the following configuration
-
-Amount    Type
-25Gb      RWO
-
-
-A playbook is available to create some NFS Exports into the master and 
-
-
-Step #4: Check the hosts file and update with the hosts available in your OpenShift installation
-
-[openshift-hosts]
-master.example.com
-infra.example.com
-node[1:4].example.com
-
-
-Step #5: Check the file group_vars/all and change with all information needed for your installation
-
-for example, if your OpenShift's Domain is "mydomain.com", then change the value accordingly:
-openshift_domain: mydomain.com
-
-Step #6: Some applications need some particular files in order to install. Be sure you've got the following files available and upload them the right directory:
-
-Ansible Tower:
-Ansible Tower's License file 
-
-Business Center:
-
-
-Step #7: (OPTIONAL) If want to have each product running in separate node, update the following variables in file group_vars/all such as:
-
-# RHMAP will be run on Nodes 1 and 2
-# oc label node/node1.example.com rhmap=core
-# oc label node/node2.example.com rhmap=core
-
-...and then, define into the variable:
-selector_core: "rhmap=core"
-
-
-
-At the end of your installation, you're going to have the following products installed:
-. Red Hat CloudForms
-. Red Hat Ansible Tower
-. Red Hat Mobile Application Platform
-. Red Hat Business Center
-. Gogs
-. Jenkins
-. Nexus
-. Locust 
-
-Tags:
---tags check
-Check if the user is OpenShift's System Administrator "system:admin" and verify if all the necessary 
--- tags install_rhmap
--- tags install_rhmap_core
--- tags install_rhmap_mbaas
--- tags tower
--- tags cloudforms
-
-
-Pending Tasks:
-
-We tried really hard to provisioning and config all the necessary applications using each Application's API. Unfortunately, not all products has a full and rich API that enable us to config and add all the necessary information. Here are some pending tasks that you might need to add manually:
-
-. Red Hat Ansible Tower
-[PENDING: Robert]: Why does we need a forumadmin user inserted ? Can we just add demo user instead ?
-[PENDING: Robert]: Why tower needs a root/password from OpenShift ? Can we just use demo user instead ?
-
-. Red Hat CloudForms
-. Red Hat Mobile Application Platform
-
-
-
-
-
 
