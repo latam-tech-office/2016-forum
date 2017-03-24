@@ -1,5 +1,5 @@
 <h1><a href="https://www.gitbook.com/book/latam-tech-office/forumdemo">LATAM Red Hat Forum 2016 Demo</a></h1>
-This is demo shown during LATAM Red Hat Forum 2016 featuring several applications from Red Hat portfolio by delivering an ficticious Travel Agency scenario. Every application here runs in a container on top of <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> with minimum of 6 Nodes and some Persistence Storage avaible.
+This is a demo shown during LATAM Red Hat Forum 2016 featuring several applications from Red Hat portfolio by delivering an ficticious Travel Agency scenario. Every application here runs in a container on top of <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> with minimum of 6 Nodes and some Persistence Storage avaible.<br/>
 
 A detail instructions of how every application works, troubleshooting and more is available here: <a href="https://www.gitbook.com/book/latam-tech-office/forumdemo">https://www.gitbook.com/book/latam-tech-office/forumdemo</a>
 
@@ -20,9 +20,9 @@ A detail instructions of how every application works, troubleshooting and more i
     Address: 208.84.244.112
     ```
 
-    If that doesn't work, RHMAP will definitely fail. 
+    If that doesn't work, <a href="https://www.redhat.com/en/technologies/mobile/application-platform">RHMAP</a> will definitely fail. 
 
-3. You need an active Red Hat Subscription (ideally an Employee SKU) applied to all hosts which allows you to download all the necessary products.
+3. You need an active <a href="https://www.redhat.com/en/about/value-of-subscription">Red Hat Subscription</a> (ideally an Employee SKU) applied to all hosts which allows you to download all the necessary products.
 
 4. You need to be <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift</a> System Administrator in order to run this installer.
     ```
@@ -30,9 +30,9 @@ A detail instructions of how every application works, troubleshooting and more i
     Logged into "https://master.example.com:8443" as "system:admin" using existing credentials.
     ```
 
-The installer needs Administratives privileges in order to create and setup all the necessary permissions for each application.
+    The installer needs Administratives privileges in order to create and setup all the necessary permissions for each application.
 
-5. You need som Persistence Volume (or PV) available at yours <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift's Cluster</a>:
+5. You need some Persistence Volume (or PV) available at yours <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift's Cluster</a>:
     ```
     # oc get pv
     NAME                  CAPACITY   ACCESSMODES   RECLAIMPOLICY   STATUS      CLAIM                                REASON    AGE
@@ -66,7 +66,7 @@ The installer needs Administratives privileges in order to create and setup all 
 
     ```
 
-6. You need to download an <a href="https://www.ansible.com/tower">Ansible Tower</a> license and leave it at the same directory as the installer: <b>/2016-forum</b>
+6. You need to download an <a href="https://www.ansible.com/tower">Ansible Tower</a> license and leave it at the same directory as the installer: <b>/2016-forum</b><br/>
    The file should look like: <b>license_b4451138a1234212ac8476cc756a08e9.txt</b>
 
 7. You need to download 3 jar files needed by Business Central and copy then into the folder: <b>/2016-forum/templates/rhcs-bc/installs/</b>
@@ -99,6 +99,7 @@ The installer needs Administratives privileges in order to create and setup all 
 ## When you've done all that
 
 You're ready to run the installer by typing:
+
     ```
     # ./install.yaml
     PLAY [Check if all OpenShift's Hosts is registered using Red Hat's Subscription Manager] ***
@@ -113,7 +114,7 @@ You're ready to run the installer by typing:
 
     ```
 
-REMEMBER: This installation provisions all the applications, create all the necessary projects inside <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> and setup all the data in each applicatin. Hence, it might take aproximadelly 50 minutes to get it done. 
+<b>REMEMBER:</b> This installation provisions all the applications, create all the necessary projects inside <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> and setup all the data in each applicatin. Hence, it might take approximately <u><b>50 minutes</b></u> to get it done. 
 
 There is a chance that some installation might fail. In that case, you might want to rerun the whole installer again, or you can always install each application individually. For example, let's suppose that I want to install just CloudForms and Ansible Tower:
 
