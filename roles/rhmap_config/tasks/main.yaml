@@ -1,0 +1,43 @@
+- name: Installing epel-release for Node.js
+  yum: name=epel-release state=latest
+  tags:
+     - rhmap_config
+     - rhmap
+
+- name: Installing Node.js
+  yum: name=nodejs state=latest
+  tags:
+     - rhmap_config
+     - rhmap
+
+- name: Installing FeedHenry Command Line
+  command: npm install -g fh-fhc
+  ignore_errors: True
+  tags:
+     - rhmap_config
+     - rhmap
+
+- name: Set RHMAP Target
+  command: fhc target http://rhmap-proxy.{[ rhmap_project_core }}.svc.cluster.local:8010
+  tags:
+     - rhmap_config
+     - rhmap
+
+- name: Fetch Administrator's Username
+  command: "oc get dc/millicore --output jsonpath='{{ '{' }}.spec.template.spec.containers[*].env[?(@.name==\"FH_ADMIN_USER_NAME\")].value{{ '}' }}' --namespace {{ rhmap_project_core }}"
+  register: administrator_username
+  tags:
+     - rhmap_config
+     - rhmap
+
+- name: Fetch Administrator's Password
+  command: "oc get dc/millicore --output jsonpath='{{ '{' }}.spec.template.spec.containers[*].env[?(@.name==\"FH_ADMIN_USER_PASSWORD\")].value{{ '}' }}' --namespace {{ rhmap_project_core }}"
+  register: administrator_password
+  tags:
+     - rhmap_config
+     - rhmap
+
+- name: Login as username{{ ':' }} {{ administrator_username }}  password{{ ':' }} {{ administrator_password }}
+  command: fhc login {{ administrator_username }} {{ administrator_password }}
+
+- name: fhc projects create <project_name: RHTravel> bare_project
