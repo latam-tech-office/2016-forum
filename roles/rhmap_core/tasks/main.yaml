@@ -167,3 +167,32 @@
      - rhmap_core
      - info
      - rhmap
+
+- name: Replace GIT_EXTERNAL_PROTOCOL in millicore{{ ':' }} https{{ ':' }}//access.redhat.com/solutions/2906721
+  command: oc patch deploymentconfig/millicore --patch '{"spec"{{ ':' }}{"template"{{ ':' }}{"spec"{{ ':' }}{"containers"{{ ':' }}[{"name"{{ ':' }}"millicore","env"{{ ':' }}[{"name"{{ ':' }}"GIT_EXTERNAL_PROTOCOL","value"{{ ':' }}"http"}]}]}}}}' --namespace {{ rhmap_project_core }}
+  tags:
+     - rhmap_core
+     - rhmap
+     - rhmap_patch
+
+- name: Create a special PersitentVolumeClaim (or PVC) for Gitlab-shell{{ ':' }} https{{ ':' }}//access.redhat.com/solutions/2919671
+  command: oc create --namespace {{ rhmap_project_core }} --filename templates/persistentvolumeclaim-gitlab-shell.yaml
+  tags:
+     - rhmap_core
+     - rhmap
+     - rhmap_patch
+
+- name: Remove the current volume on gitlab-shell for this newly created PersistentVolumeClaim
+  command: oc volume dc/gitlab-shell --name=git-data-volume --remove --namespace {{ rhmap_project_core }}
+  tags:
+     - rhmap_core
+     - rhmap
+     - rhmap_patch
+
+- name: Recreate the volume on gitlab-shell for this newly created PersistentVolumeClaim
+  command: oc volume deploymentconfig/gitlab-shell --name=git-data-volume --add --mount-path=/home/git/data --claim-name=gitlab-shell-claim --namespace {{ rhmap_project_core }}
+  tags:
+     - rhmap_core
+     - rhmap
+     - rhmap_patch
+

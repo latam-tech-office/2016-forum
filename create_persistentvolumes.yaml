@@ -44,11 +44,22 @@
       tags:
          - create
 
+    - name: Create directory for NFS Exports{{ ':' }} RHMAP/gitlab-shell based on https{{ ':' }}//access.redhat.com/solutions/2919671
+      file: path={{ nfs_path_prefix }}-gitlab-shell group=nfsnobody owner=nfsnobody mode=777 state=directory recurse=yes
+      tags:
+         - create
+
     - name: Create all the necessary information in /etc/exports
       lineinfile: dest=/etc/exports line="{{ nfs_path_prefix }}{{ item.pv_index  }}-{{ item.pv_size }}g-{{ item.type }} *(rw,root_squash,no_wdelay)"
       with_items: "{{ persistent_volumes }}"
       tags:
          - create
+
+    - name: Special custom taylored for RHMAP/gitlab-shell on /etc/exports{{ ':' }} https{{ ':' }}//access.redhat.com/solutions/2919671
+      lineinfile: dest=/etc/exports line="{{ nfs_path_prefix }}-gitlab-shell *(rw,no_root_squash,no_wdelay)"
+      tags:
+         - create
+
 
     - name: Add the following lines into the IPTables rules for NFS
       lineinfile: dest=/etc/sysconfig/iptables state=present insertbefore="COMMIT" line="{{ item }}"
@@ -98,6 +109,12 @@
       tags: 
          - pv_yaml
 
+    - name: Template a Persisten Volume for Gitlab-Shell{{ ':' }} https{{ ':' }}//access.redhat.com/solutions/2919671
+      template: src=templates/persistentvolume-gitlab-shell.yaml.j2 dest=/tmp/persistentvolume-gitlab-shell.yaml
+      tags:
+         - pv_yaml 
+         - pv_yaml_gitlab
+
     - name: Change to administrator user in OpenShift
       command: oc login --username=system:admin
       tags:
@@ -113,6 +130,12 @@
       command: oc create -f /tmp/persistentvolume.yaml
       tags:
          - pv_yaml
+
+    - name: Create PV for Gitlab Shell
+      command: oc create -f /tmp/persistentvolume-gitlab-shell.yaml
+      tags:
+         - pv_yaml
+         - pv_yaml_gitlab
 
   handlers:
     - name: Restart IPTables Service
