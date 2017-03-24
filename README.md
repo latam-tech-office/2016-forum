@@ -1,12 +1,12 @@
 <h1><a href="https://www.gitbook.com/book/latam-tech-office/forumdemo">LATAM Red Hat Forum 2016 Demo</a></h1>
 This is demo shown during LATAM Red Hat Forum 2016 featuring several applications from Red Hat portfolio by delivering an ficticious Travel Agency scenario. Every application here runs in a container on top of <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> with minimum of 6 Nodes and some Persistence Storage avaible.
 
-A detail instructions of how every application works, troubleshooting and more is available here: <a href="https://www.gitbook.com/book/latam-tech-office/forumdemo"/>
+A detail instructions of how every application works, troubleshooting and more is available here: <a href="https://www.gitbook.com/book/latam-tech-office/forumdemo"></a>
 
 ## Before running the installer, please make sure
 <h4><b>Note:</b> A installer called here it's a Ansible Playbook with a set of instructions based on a inventory file (hosts).</h4> 
 
-1. You need an <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> (latest version possible) available at your disposal with *minimum* of 6 Nodes, with a user created named 'demo'. (if you do want to use a different user, please look at step 9).
+1. You need a <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> (latest version possible) available at your disposal with *minimum* of 6 Nodes, with a user created named <b><i>'demo'</i></b>. (if you do want to use a different user, please look at step 9).
 
 2. It's important that inside of yours <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> installation be able to resolve "cloudapps" domain.
 
@@ -32,7 +32,7 @@ A detail instructions of how every application works, troubleshooting and more i
 
 The installer needs Administratives privileges in order to create and setup all the necessary permissions for each application.
 
-5. You need som Persistence Volume (or PV) available at yours <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Cluster's</a>:
+5. You need som Persistence Volume (or PV) available at yours <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift's Cluster</a>:
     ```
     # oc get pv
     NAME                  CAPACITY   ACCESSMODES   RECLAIMPOLICY   STATUS      CLAIM                                REASON    AGE
@@ -113,7 +113,7 @@ You're ready to run the installer by typing:
 
     ```
 
-REMEMBER: This installation provisions all the applications, create all the necessary projects inside OpenShift Container Platform and setup all the data in each applicatin. Hence, it might take aproximadelly 50 minutes to get it done. 
+REMEMBER: This installation provisions all the applications, create all the necessary projects inside <a href="https://docs.openshift.com/container-platform/3.4/welcome/index.html">OpenShift Container Platform</a> and setup all the data in each applicatin. Hence, it might take aproximadelly 50 minutes to get it done. 
 
 There is a chance that some installation might fail. In that case, you might want to rerun the whole installer again, or you can always install each application individually. For example, let's suppose that I want to install just CloudForms and Ansible Tower:
 
