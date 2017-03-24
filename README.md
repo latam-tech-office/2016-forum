@@ -3,6 +3,17 @@ This is a demo shown during <a href="https://www.redhat.com/en/about/events">LAT
 
 <h2><a href="https://www.gitbook.com/book/latam-tech-office/forumdemo">A detail instructions of how every application works, troubleshooting and more is available</a></h2>
 
+After installation, you're going to get an environment with the following applications:
+. <a href="https://www.redhat.com/en/technologies/management/cloudforms">Red Hat CloudForms</a>
+. <a href="https://www.ansible.com/tower">Red Hat Ansible Tower</a>
+. <a href="http://locust.io/">Locust</a>
+. <a href="https://access.redhat.com/documentation/en-US/JBoss_Enterprise_BRMS_Platform/5/html/BRMS_Business_Process_Management_Guide/chap-Business_Central_Console.html">Red Hat Business Central</a>
+. <a href="https://gogs.io/">Gogs</a>
+. <a href="https://jenkins.io/">Jenkins</a>
+. <a href="http://www.sonatype.org/nexus/">Nexus</a>
+. Several Microservices written in Java, .NET, PHP
+. <a href="https://www.redhat.com/en/technologies/mobile/application-platform">Red Hat Mobile Application Platform (aka RHMAP)</a>
+
 ## Before running the installer, please make sure
 <h4><b>Note:</b> A installer called here it's a Ansible Playbook with a set of instructions based on a inventory file (hosts).</h4> 
 
