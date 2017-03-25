@@ -8,6 +8,7 @@
 - name: Installing LATAM Red Hat Forum 2016 Demo
   hosts: localhost
   connection: local
+  gather_facts: False
   tasks:
      - name: Log as OpenShift's Administrator{{ ':' }} system:admin
        command: oc login --username=system:admin --insecure-skip-tls-verify

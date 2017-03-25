@@ -52,6 +52,13 @@
      - rhmap_core
      - rhmap
 
+- name: Create a special PersitentVolumeClaim (or PVC) for Gitlab-shell{{ ':' }} https{{ ':' }}//access.redhat.com/solutions/2919671
+  command: oc create --namespace {{ rhmap_project_core }} --filename templates/persistentvolumeclaim-gitlab-shell.yaml
+  tags:
+     - rhmap_core
+     - rhmap
+     - rhmap_patch
+
 - name: "Make sure this project runs only on a Node {{ rhmap_selector_core }}"
   command: "oc patch namespace/{{ rhmap_project_core }} --patch='{\"metadata\": {\"annotations\": {\"openshift.io/node-selector\": \"{{ rhmap_selector_core }}\" }}}' --namespace {{ rhmap_project_core }}"
   when: rhmap_selector_core is defined
@@ -175,24 +182,9 @@
      - rhmap
      - rhmap_patch
 
-- name: Create a special PersitentVolumeClaim (or PVC) for Gitlab-shell{{ ':' }} https{{ ':' }}//access.redhat.com/solutions/2919671
-  command: oc create --namespace {{ rhmap_project_core }} --filename templates/persistentvolumeclaim-gitlab-shell.yaml
+- name: Replace Persistent Volume Claim on GitLab-shell{{ ':' }} https{{ ':' }}//access.redhat.com/solutions/2919671
+  command: oc patch deploymentconfig/gitlab-shell --patch '{"spec"{{ ':' }}{"template"{{ ':' }}{"spec"{{ ':' }}{"volumes"{{ ':' }}[{"name"{{ ':' }}"git-data-volume","persistentVolumeClaim"{{ ':' }}{"claimName"{{ ':' }}"gitlab-shell-claim"}}]}}}}' --namespace {{ rhmap_project_core }}
   tags:
      - rhmap_core
      - rhmap
      - rhmap_patch
-
-- name: Remove the current volume on gitlab-shell for this newly created PersistentVolumeClaim
-  command: oc volume dc/gitlab-shell --name=git-data-volume --remove --namespace {{ rhmap_project_core }}
-  tags:
-     - rhmap_core
-     - rhmap
-     - rhmap_patch
-
-- name: Recreate the volume on gitlab-shell for this newly created PersistentVolumeClaim
-  command: oc volume deploymentconfig/gitlab-shell --name=git-data-volume --add --mount-path=/home/git/data --claim-name=gitlab-shell-claim --namespace {{ rhmap_project_core }}
-  tags:
-     - rhmap_core
-     - rhmap
-     - rhmap_patch
-
