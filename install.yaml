@@ -15,11 +15,11 @@
        tags:
           - check
   roles: 
+     - rhmap_core
+     - rhmap_mbaas
      - tower
      - cloudforms
      - locust
      - tooling
      - business_central
      - microservices
-     - rhmap_core
-     - rhmap_mbaas
