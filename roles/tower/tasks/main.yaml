@@ -4,7 +4,8 @@
   tags:
      - testlicense
      - tower
-     - check
+     - check  
+     - reconfigtower
 
 - name: Does the Ansible Tower license exists ?
   fail: msg="Ansible Tower License file{{ ':' }} {{ ansibletower_license_file }} wasn't found" 
@@ -12,6 +13,7 @@
   tags:
      - testlicense
      - tower
+     - reconfigtower
          
 - name: Login as admin within OpenShift Environment
   command: oc login --username=system:admin
@@ -138,12 +140,14 @@
   tags:
      - tower
      - configtower
+     - reconfigtower
          
 - set_fact: tower_port={{ ansible_tower_port.stdout }}
   when: '{{ "rcalvaga" not in ansibletower_dockerimage }}'
   tags:
      - tower
      - configtower
+     - reconfigtower
          
 - name: Fetch Ansible Tower port (Robert's Docker Image)
   command: oc get service/tower --output jsonpath='{..spec.ports.*.port}' --namespace {{ ansibletower_namespace }}
@@ -153,18 +157,21 @@
   tags:
      - tower
      - configtower
+     - reconfigtower
          
 - set_fact: tower_port={{ ansible_tower_port.stdout }}
   when: '{{ "rcalvaga" in ansibletower_dockerimage }}'
   tags:
      - tower
      - configtower
+     - reconfigtower
          
 - name: Define Ansible Tower URL
   set_fact: ansible_tower_url='https://tower.{{ ansibletower_namespace }}.svc.cluster.local:{{ tower_port }}'
   tags: 
      - tower
      - configtower
+     - reconfigtower
          
 - name: Wait for Ansible Tower to be up{{ ':' }} {{ ansible_tower_url }}
   uri: url="{{ ansible_tower_url }}" validate_certs=no status_code=200 
@@ -175,16 +182,19 @@
   tags: 
      - tower
      - configtower
+     - reconfigtower
          
 - set_fact: license_content={{ lookup('file', '{{ ansibletower_license_file }}') }}
   tags:
      - tower
+     - reconfigtower
          
 - name: Adding a EULA into the License file
   lineinfile: dest=./{{ ansibletower_license_file }} regexp="{" line="{\n    \"eula_accepted\"{{ ':' }} true,"
   when: '{{ "eula_accepted" not in license_content }}'
   tags: 
      - tower
+     - reconfigtower
 
 - name: Apply the license file into Ansible Tower
   uri: method=POST body_format=json url="{{ ansible_tower_url }}/api/v1/config/"   status_code=200
@@ -193,6 +203,7 @@
        body="{{ lookup('file', '{{ ansibletower_license_file }}') }}"
   tags: 
      - tower
+     - reconfigtower
 
 - name: Adding {{ username }} to Ansible Tower
   uri:  
@@ -212,6 +223,7 @@
      - tower
      - configtower
      - createuserstower
+     - reconfigtower
 
 - name: Adding forumuser to Ansible Tower
   uri:  
@@ -231,6 +243,7 @@
      - tower
      - configtower
      - createuserstower
+     - reconfigtower
 
 - name: Adding forumadmin to Ansible Tower
   uri:
@@ -249,6 +262,7 @@
       - tower
       - configtower
       - createuserstower
+      - reconfigtower
 
 - name: Adding forumauditor to Ansible Tower
   uri:
@@ -267,6 +281,7 @@
        - tower
        - configtower
        - createuserstower
+       - reconfigtower
 
 - name: Creating OpenShift Enterprise 3 Project within Ansible Tower
   uri:
@@ -285,6 +300,7 @@
        - tower
        - configtower
        - createprojectstower
+       - reconfigtower
 
 - name: Creating LATAM Red Hat Forum Team within Ansible Tower
   uri:
@@ -303,6 +319,7 @@
        - tower
        - configtower
        - createteamstower
+       - reconfigtower
 
 - name: Creating OpenShift Credentials within Ansible Tower
   uri:
@@ -321,6 +338,7 @@
        - tower
        - configtower
        - createcredentialstower
+       - reconfigtower
 
 - name: Creating OpenShift Inventory within Ansible Tower
   uri:
@@ -339,6 +357,7 @@
        - tower
        - configtower
        - createinventoriestower
+       - reconfigtower
 
 - name: Creating master-group within Ansible Tower
   uri:
@@ -357,6 +376,7 @@
        - tower
        - configtower
        - creategroupstower
+       - reconfigtower
 
 - name: Creating nodes-group within Ansible Tower
   uri:
@@ -375,6 +395,7 @@
        - tower
        - configtower
        - creategroupstower
+       - reconfigtower
 
 - name: Creating OSE Master "{{ openshift_master_hostname }}" Host within Ansible Tower
   uri:
@@ -393,6 +414,7 @@
        - tower
        - configtower
        - createhoststower
+       - reconfigtower
 
 - name: Creating "Create a Project In OpenShift 3" Job Template within Ansible Tower
   uri:
@@ -415,6 +437,7 @@
        - tower
        - configtower
        - createjobtemplatestower
+       - reconfigtower
 
 - name: Creating "Create RHT Forum LATAM 2016 Apps in OpenShift 3" Job Template within Ansible Tower
   uri:
@@ -437,6 +460,7 @@
        - tower
        - configtower
        - createjobtemplatestower
+       - reconfigtower
 
 - name: Creating "Delete a Project In OpenShift 3" Job Template within Ansible Tower
   uri:
@@ -459,6 +483,7 @@
        - tower
        - configtower
        - createjobtemplatestower
+       - reconfigtower
 
 - name: Creating "Delete RHT Forum LATAM 2016 Apps in OpenShift 3" Job Template within Ansible Tower
   uri:
@@ -481,3 +506,4 @@
        - tower
        - configtower
        - createjobtemplatestower
+       - reconfigtower
