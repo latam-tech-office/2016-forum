@@ -1,0 +1,11 @@
+[Unit]
+Description=Service to configure Ansible Tower content for our Demo from scratch via API Calls
+After=atomic-openshift-node.service
+
+[Service]
+WorkingDirectory=/root
+Environment=KUBECONFIG=/root/.kube/config
+ExecStart=/root/2016-forum/install.yaml --tags reconfigtower
+
+[Install]
+WantedBy=atomic-openshift-node.service
