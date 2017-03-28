@@ -507,3 +507,14 @@
        - configtower
        - createjobtemplatestower
        - reconfigtower
+  
+- name: Create the ansible-tower-content.service unit file
+  template: src=templates/ansible-tower-content.service.j2 dest=/etc/systemd/system/ansible-tower-content.service mode=644
+
+- name: reload systemctl
+  command: systemctl daemon-reload
+
+- name: Start ansible-tower-content.service
+  service: name=ansible-tower-content.service state=started enabled=yes
+
+   
