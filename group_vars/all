@@ -20,10 +20,10 @@ openshift_master_password: r3dh4t1!
 ### RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP 
 ###   RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP 
 rhmap_subscription_manager_repositories:
-      - rhel-7-server-rhmap-4.2-rpms
+      - rhel-7-server-rhmap-4.3-rpms
 rhmap_subscription_manager_templates:
       - rhmap-fh-openshift-templates
-      - fh-system-dump-tool
+#      - fh-system-dump-tool
 
 # Information specific to RHMAP Core and MBaaS
 rhmap_project_core: "rhmap-core"

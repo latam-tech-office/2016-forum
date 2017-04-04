@@ -3,6 +3,7 @@
   with_items: "{{ rhmap_subscription_manager_templates }}"
   tags:
      - templates
+     - rhmap_core
      - rhmap
 
 - name: "Remove any possible existing ssh keys"
@@ -79,7 +80,7 @@
      - rhmap
 
 - name: "Create Monitoring Resouces"
-  command: oc new-app --file {{ rhmap_directory_rhmap }}/core/fh-core-monitoring.json --param SMTP_SERVER={{ rhmap_smtp_server }} --param SMTP_USERNAME={{ rhmap_smtp_username }} --param SMTP_PASSWORD={{ rhmap_smtp_password }} --param SMTP_FROM_ADDRESS={{ rhmap_smtp_from_address }} --param ADMIN_EMAIL={{ rhmap_admin_email }} --param RHMAP_HOSTGROUPS="core" --namespace {{ rhmap_project_core }}
+  command: oc new-app --file {{ rhmap_directory_rhmap }}/core/fh-core-monitoring.json --param SMTP_SERVER={{ rhmap_smtp_server }} --param SMTP_USERNAME={{ rhmap_smtp_username }} --param SMTP_PASSWORD={{ rhmap_smtp_password }} --param SMTP_FROM_ADDRESS={{ rhmap_smtp_from_address }} --param RHMAP_ADMIN_EMAIL={{ rhmap_admin_email }} --param RHMAP_HOSTGROUPS="core" --namespace {{ rhmap_project_core }}
   tags: 
      - rhmap_core
      - rhmap

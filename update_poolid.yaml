@@ -1,0 +1,49 @@
+---
+- name: Updating all hosts with a specific pool ID from Subscription Manager
+  hosts: all
+  vars:
+     repositories:
+         - rhel-7-server-rpms
+         - rhel-7-server-extras-rpms
+         - rhel-7-server-ose-3.4-rpms
+         - rhel-7-server-rhmap-4.3-rpms
+     tools:
+         - wget
+         - git
+         - net-tools
+         - bind-utils
+         - iptables-services
+         - bridge-utils
+         - bash-completion
+         - vim
+         - docker
+         - httpd-tools
+         - rhmap-fh-openshift-templates
+         - subscription-manager-plugin-container
+  tasks:
+     - name: Please use <poolid> option
+       fail: msg="Variable <poolid> is not defined"
+       failed_when: poolid is not defined
+
+     - name: Attaching PoolID{{ ':' }} {{ poolid }}
+       command: subscription-manager attach --pool={{ poolid }}
+   
+     - name: Disable all Repositories
+       command: subscription-manager repos --disable="*"
+
+     - name: Enabling certain repositories
+       command: subscription-manager repos --enable={{ item }}
+       with_items: "{{ repositories }}"
+
+     - name: Update all packages based on the latest repositories
+       yum: name='*' state=latest update_cache=yes
+
+     - name: Installing Applications 
+       yum: name={{ item }} state=latest
+       with_items: "{{ tools }}"
+
+     - name: Installing RHSM plugin subscription-manager-plugin-container
+       yum: name="subscription-manager-plugin-container" state=present
+
+     - name: Running rhsmcertd-worker to refresh the local certificate store
+       command: /usr/libexec/rhsmcertd-worker
