@@ -8,7 +8,7 @@
 #
 # All applications will be installed for this User
 username: demo
-password: r3dh4t1!
+password: R3dh4t1!
 
 ### OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT 
 openshift_domain: example.com
