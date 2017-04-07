@@ -343,7 +343,7 @@ objects:
               memory: 1Gi
           terminationMessagePath: /dev/termination-log
           volumeMounts:
-          - mountPath: /opt/nexus-work
+          - mountPath: /nexus-data
             name: nexus-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
