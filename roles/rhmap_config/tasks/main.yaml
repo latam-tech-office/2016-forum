@@ -82,8 +82,14 @@
      - rhmap_config
      - rhmap
 
-- name: Create a demo user
-  command: fhc admin-users create username={{ username }} password={{ password }} email={{ username }}@{{ username }}.com name={{ username }} roles=customeradmin,portaladmin,devadmin,dev,analytics
+- set_fact: rhmap_demo_user={{ username }}@{{ username }}.com
+  tags:
+     - rhmap
+     - rhmap_config
+     - rhmap_config_demo
+
+- name: Create a {{ rhmap_demo_user }} user
+  command: fhc admin-users create username={{ rhmap_demo_user }} password={{ password }} email={{ rhmap_demo_user }} name={{ rhmap_demo_user }} roles=customeradmin,portaladmin,devadmin,dev,analytics
   register: rhmap_create_user
   tags:
      - rhmap_config
@@ -113,21 +119,21 @@
      - rhmap_config_mbaas
 
 - name: Create an Enviroment for this MBaaS Target (PENDING{{ ':' }} FETCH MASTER's TOKEN)
-  command: fhc admin environments create --id demo --label Demo --target mbaas --token 8zfdzKkUxItohW3i3C4ik8EFm5aO0Q3i7kcTiwgmn2w
+  command: fhc admin environments create --id demo --label Demo --target mbaas --token lH9rMIbybq-OlFqVr8Jv4sxvljRX9jSdThDMaX1deZA
   tags:
      - rhmap_config
      - rhmap
      - rhmap_config_mbaas
 
 - name: Log as Demo user
-  command: fhc login {{ username }} {{ password }}
+  command: fhc login {{ rhmap_demo_user }} {{ password }}
   tags:
      - rhmap_config
      - rhmap
      - rhmap_config_demo
 
 - name: Create a RHTTravel Project
-  command: fhc projects create RHTravel bare_project
+  command: fhc projects create RedHat-Travel bare_project
   register: project_info
   tags:
      - rhmap_config
@@ -195,7 +201,3 @@
      - rhmap_config
      - rhmap
      - rhmap_config_demo
-
-
-
-
