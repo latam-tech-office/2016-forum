@@ -1,0 +1,23 @@
+---
+- name: Fetching OpenShift Token
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+     - name: Requesting authorization from OpenShift
+       uri:
+         url: https://openshift.default.svc.cluster.local/oauth/authorize?response_type=token&client_id=openshift-challenging-client
+         validate_certs: False
+         follow_redirects: none
+         method: GET
+         user: "{{ username }}"
+         password: "{{ password }}"
+         force_basic_auth: True
+         status_code: 302
+       register: authorization_request
+
+     - debug: var=authorization_request
+
+     - set_fact: openshift_token={{ authorization_request.location | regex_replace("^(.*)access_token[=]", "") | regex_replace("[&](.*)$", "") }}
+
+     - debug: msg="Token {{ ':' }} {{ openshift_token }}"

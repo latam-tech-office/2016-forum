@@ -17,6 +17,10 @@ openshift_master_hostname: master.{{ openshift_domain }}
 openshift_master_username: root
 openshift_master_password: r3dh4t1!
 
+# This is the username/password for the user where all projects will be created
+openshift_username: demo
+openshift_password: r3dh4t1!
+
 ### RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP 
 ###   RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP RHMAP 
 rhmap_subscription_manager_repositories:
