@@ -105,7 +105,7 @@
      - configcloudforms
      - cloudforms             
 
-- name: Wait Business Central to settle down a while
+- name: Wait for CloudForms to settle down a while
   pause: seconds=60
   tags:
      - configcloudforms
