@@ -1,0 +1,40 @@
+silly login POST data { u: 'rhmap-admin@example.com',
+silly login POST data   p: '3WWs4P1ArTfioIKtXbtkcwk8SX',
+silly login POST data   d: undefined }
+verbose feedhenry url https://rhmap.cloudapps.example.com/
+silly POST /box/srv/1.1/act/sys/auth/login
+silly url, unparsed https://rhmap.cloudapps.example.com/
+verbose resolveUrl - IN /box/srv/1.1/act/sys/auth/login
+verbose resolveUrl - OUT https://rhmap.cloudapps.example.com/box/srv/1.1/act/sys/auth/login
+verbose calling url https://rhmap.cloudapps.example.com/box/srv/1.1/act/sys/auth/login payload: { u: 'rhmap-admin@example.com',
+verbose calling url   p: '3WWs4P1ArTfioIKtXbtkcwk8SX',
+verbose calling url   d: undefined }
+silly port 443
+silly cookie feedhenry=rxr72wafqbs6fdzkkl5llu3s;
+silly nocache false
+silly explain level 0
+verbose getHeaders { accept: 'application/json',
+verbose getHeaders   cookie: 'feedhenry=rxr72wafqbs6fdzkkl5llu3s;',
+verbose getHeaders   'User-Agent': 'FHC/2.17.1-516 linux/3.10.0-514.6.1.el7.x86_64',
+verbose getHeaders   'content-type': 'application/json',
+verbose getHeaders   'content-length': 64 }
+verbose what... { u: 'rhmap-admin@example.com',
+verbose what...   p: '3WWs4P1ArTfioIKtXbtkcwk8SX',
+verbose what...   d: undefined }
+silly writing json { u: 'rhmap-admin@example.com',
+silly writing json   p: '3WWs4P1ArTfioIKtXbtkcwk8SX',
+silly writing json   d: undefined }
+silly headers { accept: 'application/json',
+silly headers   cookie: 'feedhenry=rxr72wafqbs6fdzkkl5llu3s;',
+silly headers   'User-Agent': 'FHC/2.17.1-516 linux/3.10.0-514.6.1.el7.x86_64',
+silly headers   'content-type': 'application/json',
+silly headers   'content-length': 64 }
+silly getProxy null
+silly login response undefined
+ERR! login [Error: undefined log message]
+ERR! { [Error: Error - not 2xx status code. (null)
+ERR! undefined] requestId: null }
+ERR! 
+ERR! System Linux 3.10.0-514.6.1.el7.x86_64
+ERR! command "/usr/bin/node" "/usr/bin/fhc" "login" "rhmap-admin@example.com" "3WWs4P1ArTfioIKtXbtkcwk8SX"
+verbose exit [ 1, true ]

@@ -1,3 +1,11 @@
+- name: Before Creating enviroment, delete project{{ ':' }} rhmap-rhmap-demo
+  command: oc delete project rhmap-rhmap-demo
+  ignore_errors: True
+  tags:
+     - rhmap_config
+     - rhmap
+     - rhmap_config_mbaas
+
 - name: Installing Node.js
   yum: name=nodejs state=latest
   tags:
@@ -118,8 +126,30 @@
      - rhmap
      - rhmap_config_mbaas
 
-- name: Create an Enviroment for this MBaaS Target (PENDING{{ ':' }} FETCH MASTER's TOKEN)
-  command: fhc admin environments create --id demo --label Demo --target mbaas --token lH9rMIbybq-OlFqVr8Jv4sxvljRX9jSdThDMaX1deZA
+- name: Requesting authorization from OpenShift in order to obtain a Token
+  uri:
+    url: https://openshift.default.svc.cluster.local/oauth/authorize?response_type=token&client_id=openshift-challenging-client
+    validate_certs: False
+    follow_redirects: none
+    method: GET
+    user: "{{ openshift_username }}"
+    password: "{{ openshift_password }}"
+    force_basic_auth: True
+    status_code: 302
+  register: authorization_request
+  tags:
+     - rhmap_config
+     - rhmap
+     - rhmap_config_mbaas
+
+- set_fact: openshift_token={{ authorization_request.location | regex_replace("^(.*)access_token[=]", "") | regex_replace("[&](.*)$", "") }}
+  tags:
+     - rhmap_config
+     - rhmap
+     - rhmap_config_mbaas
+
+- name: Create an Enviroment for this MBaaS Target using Token{{ ':' }} {{ openshift_token }}
+  command: fhc admin environments create --id demo --label Demo --target mbaas --token {{ openshift_token }}
   tags:
      - rhmap_config
      - rhmap

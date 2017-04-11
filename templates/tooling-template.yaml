@@ -589,9 +589,6 @@ objects:
           ports:
           - containerPort: 5432
             protocol: TCP
-          volumeMounts:
-          - mountPath: /var/lib/pgsql/data
-            name: postgresql-data
           readinessProbe:
             exec:
               command:
@@ -611,6 +608,9 @@ objects:
             capabilities: {}
             privileged: false
           terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /var/lib/pgsql/data
+            name: postgresql-data
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         securityContext: {}
