@@ -1,9 +1,4 @@
 [openshift-hosts]
-<<<<<<< HEAD
-master.c.summit2017-162216.internal
-node[1:7].c.summit2017-162216.internal
-=======
 master.example.com
 infra.example.com
 node[1:8].example.com
->>>>>>> e11492316950c54342cd00bedcd612aa556c0fe8

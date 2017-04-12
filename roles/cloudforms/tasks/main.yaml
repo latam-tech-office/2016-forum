@@ -17,6 +17,9 @@
      - cleanup
      - cloudforms
 
+#- name: Force this project to run on silo=cloudforms Node selector
+#  command: oc patch namespace/{{ cloudforms_namespace }} --patch '{"metadata"{{ ':' }}{"annotations"{{ ':' }}{"openshift.io/node-selector"{{ ':' }}"silo=cloudforms" }}}'
+
 - name: Allow this pod to run in a Privileged Security Context
   command: oadm policy add-scc-to-user privileged system:serviceaccount:{{ cloudforms_namespace }}:default
   tags: 
@@ -99,7 +102,7 @@
   uri: url='{{ cloudforms_full_url }}' validate_certs=no status_code=200 
   register: cloudforms_wait
   until: cloudforms_wait.status == 200
-  retries: 100
+  retries: 200
   delay: 10
   tags: 
      - configcloudforms

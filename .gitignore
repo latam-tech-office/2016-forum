@@ -1,4 +1,5 @@
-/*.retry
-/*.swp
-/*.jar
-/license_b4451138a0004212ac8476cc275a08e9.txt
+*.retry
+*.swp
+*.jar
+license_b4451138a0004212ac8476cc275a08e9.txt
+.kube

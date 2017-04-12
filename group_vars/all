@@ -11,9 +11,9 @@ username: demo
 password: R3dh4t1!
 
 ### OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT OPENSHIFT 
-openshift_domain: forum.rhtechofficelatam.com
+openshift_domain: example.com
 openshift_cloudapps_domain: cloudapps.{{ openshift_domain }}
-openshift_master_hostname: openshift.{{ openshift_domain }}
+openshift_master_hostname: master.{{ openshift_domain }}
 openshift_master_username: root
 openshift_master_password: r3dh4t1!
 
@@ -76,7 +76,7 @@ ansibletower_license_file: license_b4451138a0004212ac8476cc275a08e9.txt
 ansibletower_username: admin
 ansibletower_password: password
 ansibletower_web_service: towerweb
-ansibletower_openshift_master: openshift.{{ openshift_domain }}
+ansibletower_openshift_master: master.{{ openshift_domain }}
 
 ### TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING
 ###   TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING TOOLING 
