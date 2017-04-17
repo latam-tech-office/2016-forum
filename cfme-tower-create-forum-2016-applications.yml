@@ -37,4 +37,4 @@
        command: oadm policy add-role-to-user edit system:serviceaccount:{{ tooling_namespace }}:jenkins --namespace {{ microservices_namespace }}
   
      - name: Create the application based on a template
-       command: oc new-app templates/forum-apps-template.yaml~https://github.com/latam-tech-office/2016-forum.git --param=REPOSITORY_USER={{ username }} --param=GOGS_URL={{ gogs_url }} --param=NEXUS_URL={{ nexus_url }} --namespace {{ microservices_namespace }}
+       command: oc new-app https://github.com/latam-tech-office/2016-forum/blob/master/templates/forum-apps-template.yaml --param=REPOSITORY_USER={{ username }} --param=GOGS_URL={{ gogs_url }} --param=NEXUS_URL={{ nexus_url }} --namespace {{ microservices_namespace }}
