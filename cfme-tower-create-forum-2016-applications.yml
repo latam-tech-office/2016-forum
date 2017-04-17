@@ -7,5 +7,34 @@
        command: oc login --username=system:admin --insecure-skip-tls-verify
        tags:
           - check
-  roles: 
-     - microservices
+          
+     - name: Fetch Gogs's Service Port at Namespace{{ ':' }} {{ tooling_namespace }}
+       command: oc get service/gogs --output jsonpath='{..spec.ports[?(@.name=="web")].port}' --namespace {{ tooling_namespace }}
+       register: gogs_port
+       failed_when: gogs_port.rc != 0
+
+     - name: Fetch Nexus's Service Port at Namespace{{ ':' }} {{ tooling_namespace }} 
+       command: oc get service/nexus --output jsonpath='{..spec.ports[?(@.name=="web")].port}' --namespace {{ tooling_namespace }} 
+       register: nexus_port
+       failed_when: nexus_port.rc != 0
+
+     - name: Define Gogs's and Nexus URL 
+       set_fact: gogs_url="http{{ ':' }}//gogs.{{ tooling_namespace }}.svc.cluster.local{{ ':' }}{{ gogs_port.stdout }}"
+                 nexus_url="http{{ ':' }}//nexus.{{ tooling_namespace }}.svc.cluster.local{{ ':' }}{{ nexus_port.stdout }}"
+
+     - name: Delete any previously existing namespaces 
+       command: oc delete project {{ microservices_namespace }}
+       ignore_errors: True
+
+     - name: Create a Project{{ ':' }} {{ microservices_namespace }} 
+       command: oadm new-project {{ microservices_namespace }} --display-name="MicroServices{{ ':' }} LATAM Red Hat Forum 2016" --admin={{ username }}
+       register: create_namespace
+       until: create_namespace.rc == 0
+       retries: 10
+       delay: 10
+
+     - name: Allow this Namespace{{ ':' }} {{ tooling_namespace }} to 'edit' pods in Namespace{{ ':' }} {{ microservices_namespaces }}
+       command: oadm policy add-role-to-user edit system:serviceaccount:{{ tooling_namespace }}:jenkins --namespace {{ microservices_namespace }}
+  
+     - name: Create the application based on a template
+       command: oc new-app templates/forum-apps-template.yaml~https://github.com/latam-tech-office/2016-forum.git --param=REPOSITORY_USER={{ username }} --param=GOGS_URL={{ gogs_url }} --param=NEXUS_URL={{ nexus_url }} --namespace {{ microservices_namespace }}
