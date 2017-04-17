@@ -1,4 +1,4 @@
-- name: Create RHT Forum LATAM 2016 Application in OpenShift Enterprise 3
+- name: Create RHT Forum LATAM 2016 Application in OpenShift Enterprise 3 via CloudForms+Tower
   hosts: all
   gather_facts: false
   connection: ssh
