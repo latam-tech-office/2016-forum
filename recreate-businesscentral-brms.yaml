@@ -1,0 +1,27 @@
+---
+- name: Recreate all the BRMS info into Business Central (after Restarts)
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+     - name: Fetch where the information is stored
+       command: oc get pvc/business-central --output jsonpath='{.spec.volumeName}' --namespace {{ businesscentral_namespace }}
+       register: pvc_businesscentral
+
+     - set_fact: directory_businesscentral=/var/storage/{{ pvc_businesscentral.stdout }}/brms.git
+
+     - name: Delete any existing directories{{ ':' }} {{ directory_businesscentral }}
+       file: path={{ directory_businesscentral }} state=absent
+       ignore_errors: True
+
+     - name: Git clone the content from BRMS Project into {{ ':' }} {{ directory_businesscentral }}
+       command: git clone http://gogs.tooling.svc.cluster.local:3000/demo/brms.git --bare {{ directory_businesscentral }}
+
+     - name: Setting the Origin into Git http://{{ username }}:{{ password }}@gogs.{{ tooling_namespace }}.svc.cluster.local:3000/{{ username }}/brms.git
+       shell: pushd {{ directory_businesscentral }}; git remote set-url origin 'http://{{ username }}:{{ password }}@gogs.{{ tooling_namespace }}.svc.cluster.local:3000/{{ username }}/brms.git'; popd
+
+     - name: Generating content for post-commit
+       copy: dest={{ directory_businesscentral }}/hooks/post-commit content="#!/bin/sh\ngit push origin master" mode="u+x"
+
+     - name: Getting the permissions right into this directory
+       file: path={{ directory_businesscentral }} mode="777" owner="nfsnobody" group="nfsnobody" recurse="yes"
