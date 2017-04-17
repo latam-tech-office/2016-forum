@@ -1,0 +1,11 @@
+- name: Create RHT Forum LATAM 2016 Application in OpenShift Enterprise 3
+  hosts: all
+  gather_facts: false
+  connection: ssh
+  tasks:
+     - name: Log as OpenShift's Administrator{{ ':' }} system:admin
+       command: oc login --username=system:admin --insecure-skip-tls-verify
+       tags:
+          - check
+  roles: 
+     - microservices
