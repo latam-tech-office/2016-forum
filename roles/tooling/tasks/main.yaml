@@ -22,6 +22,7 @@
   tags:
      - tooling
      - config_tooling
+     - tooling_pipeline
 
 - name: Creating all the necessary applications based on a OpenShift's template
   command: oc new-app --file=templates/tooling-template.yaml --param=GOGS_USERNAME={{ username }} --param=GOGS_PASSWORD={{ password }} --param=CLOUDAPPS_DOMAIN={{ openshift_cloudapps_domain }} --param=CLOUDAPPS_NAMESPACE={{ tooling_namespace }} --param=GOGS_URL={{ gogs_url }} --param=MICROSERVICES_NAMESPACE={{ microservices_namespace }} --namespace {{ tooling_namespace }}
@@ -32,6 +33,7 @@
   command: oc new-app --file=templates/tooling-pipeline-template.yaml --param=GOGS_USERNAME={{ username }} --param=CLOUDAPPS_NAMESPACE={{ tooling_namespace }} --param=GOGS_URL={{ gogs_url }} --param=MICROSERVICES_NAMESPACE={{ microservices_namespace }} --namespace {{ tooling_namespace }}
   tags:
      - tooling
+     - tooling_pipeline
 
 - name: Wait for Gogs to be ready{{ ":" }} {{ gogs_url }}
   uri: url="{{ gogs_url }}" status_code=200 
