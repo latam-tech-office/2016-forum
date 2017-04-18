@@ -76,7 +76,7 @@
       position: 0
       dialog_fields:
       - name: param_tooling_namespace
-        description: Tooling Namestace
+        description: Tooling Namespace
         data_type: string
         notes: 
         notes_display: 
@@ -92,7 +92,7 @@
         values_method_options: {}
         options:
           :protected: false
-        label: Tooling Namestace
+        label: Tooling Namespace
         position: 0
         validator_type: 
         validator_rule: 
