@@ -446,7 +446,7 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Create a Project In OpenShift 3","description": "Create a Project In OpenShift 3 Enterprise","job_type": "run","inventory": 34,"project": 38,"playbook": "openshift-ansible/openshift-create-project-as-admin.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Create a Project In OpenShift 3","description": "Create a Project In OpenShift 3 Enterprise","job_type": "run","inventory": 34,"project": 44,"playbook": "openshift-ansible/openshift-create-project-as-admin.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
@@ -492,7 +492,7 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Delete a Project In OpenShift 3","description": "Delete a Project In OpenShift 3 Enterprise","job_type": "run","inventory": 34,"project": 38,"playbook": "openshift-ansible/openshift-delete-project-as-admin.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Delete a Project In OpenShift 3","description": "Delete a Project In OpenShift 3 Enterprise","job_type": "run","inventory": 34,"project": 44,"playbook": "openshift-ansible/openshift-delete-project-as-admin.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nproject_name:","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
