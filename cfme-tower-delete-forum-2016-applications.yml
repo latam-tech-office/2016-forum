@@ -1,0 +1,13 @@
+- name: Delete RHT Forum LATAM 2016 Application in OpenShift Enterprise 3 via CloudForms+Tower
+  hosts: all
+  gather_facts: false
+  connection: ssh
+  tasks:
+     - name: Log as OpenShift's Administrator{{ ':' }} system:admin
+       command: oc login --username=system:admin --insecure-skip-tls-verify
+       tags:
+          - check
+          
+     - name: Delete any previously existing namespaces 
+       command: oc delete project {{ microservices_namespace }}
+       ignore_errors: True
