@@ -1,4 +1,4 @@
 [openshift-hosts]
-master.example.com
-infra.example.com
-node[1:8].example.com
+master.c.summit2017-162216.internal
+infra.c.summit2017-162216.internal
+node[1:7].c.summit2017-162216.internal
