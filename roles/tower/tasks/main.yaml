@@ -104,7 +104,7 @@
      - tower
          
 - name: Create a friendly route tower.{{ openshift_cloudapps_domain }}
-  command: oc expose service/tower --hostname=tower.{{ openshift_cloudapps_domain }} --namespace {{ ansibletower_namespace }}
+  command: oc expose service/tower --hostname=tower.{{ openshift_cloudapps_domain }} --namespace {{ ansibletower_namespace }} --port=443
   tags: 
      - create
      - tower
