@@ -61,15 +61,17 @@
      - rhmap_config
      - rhmap
 
-- name: Fetching Internal RHMAP URL
-  command: oc get service/rhmap-proxy --output jsonpath='http{{ ':' }}//{..metadata.name}.{..metadata.namespace}.svc.cluster.local{{ ':' }}{..spec.ports.*.port}' --namespace {{ rhmap_project_core }}
-  register: rhmap_internal_url
-  tags:
-     - rhmap_config
-     - rhmap
+#- name: Fetching Internal RHMAP URL
+#  command: oc get service/rhmap-proxy --output jsonpath='http{{ ':' }}//{..metadata.name}.{..metadata.namespace}.svc.cluster.local{{ ':' }}{..spec.ports.*.port}' --namespace {{ rhmap_project_core }}
+#  register: rhmap_internal_url
+#  tags:
+#     - rhmap_config
+#     - rhmap
 
-- name: Wait for RHMAP to be ready{{ ":" }} {{ rhmap_internal_url.stdout  }}
-  uri: url="{{ rhmap_internal_url.stdout }}" status_code=200
+#- name: Wait for RHMAP to be ready{{ ":" }} {{ rhmap_internal_url.stdout  }}
+#  uri: url="{{ rhmap_internal_url.stdout }}" status_code=200
+- name: Wait for RHMAP to be ready{{ ":" }} {{ rhmap_url  }}
+  uri: url="{{ rhmap_url }}" status_code=200 validate_certs=no
   register: rhmap_wait
   until: rhmap_wait.status == 200
   retries: 120
@@ -163,7 +165,7 @@
      - rhmap_config_demo
 
 - name: Create a RHTTravel Project
-  command: fhc projects create RedHat-Travel bare_project
+  command: fhc projects create RedHat-Travel bare_project --json
   register: project_info
   tags:
      - rhmap_config
@@ -218,8 +220,28 @@
      - rhmap
      - rhmap_config_demo
 
+#- name: Import Contents from fhMobileApp into project
+#  command: fhc import {{ project_info_object.guid }} mobileApp client_hybrid /tmp/fhMobileApp/fhMobileApp.zip
+#  tags:
+#     - rhmap_config
+#     - rhmap
+#     - rhmap_config_demo
+
+#- name: Import Contents from fhCloudApp into Project
+#  command: fhc import {{ project_info_object.guid }} cloudApp cloud_nodejs /tmp/fhCloudApp/fhCloudApp.zip --env=demo
+#  tags:
+#     - rhmap_config
+#     - rhmap
+#     - rhmap_config_demo
 - name: Import Contents from fhMobileApp into project
   command: fhc import {{ project_info_object.guid }} mobileApp client_hybrid /tmp/fhMobileApp/fhMobileApp.zip
+  register: mobileApp_info
+  tags:
+     - rhmap_config
+     - rhmap
+     - rhmap_config_demo
+
+- set_fact: mobileApp_info_object={{ mobileApp_info.stdout | from_json }}
   tags:
      - rhmap_config
      - rhmap
@@ -227,6 +249,26 @@
 
 - name: Import Contents from fhCloudApp into Project
   command: fhc import {{ project_info_object.guid }} cloudApp cloud_nodejs /tmp/fhCloudApp/fhCloudApp.zip --env=demo
+  register: cloudApp_info
+  tags:
+     - rhmap_config
+     - rhmap
+     - rhmap_config_demo
+- set_fact: cloudApp_info_object={{ cloudApp_info.stdout | from_json }}
+  tags:
+     - rhmap_config
+     - rhmap
+     - rhmap_config_demo
+
+- name: Deploy Cloud App
+  command: fhc app stage --app={{ cloudApp_info_object.guid }} --env=demo --runtime=node4
+  tags:
+     - rhmap_config
+     - rhmap
+     - rhmap_config_demo
+- name: Build Mobile App
+  command: fhc build app={{ mobileApp_info_object.guid }} cloud_app={{ cloudApp_info_object.guid }} destination=android project={{ project_info_object
+.guid }} environment=demo
   tags:
      - rhmap_config
      - rhmap
