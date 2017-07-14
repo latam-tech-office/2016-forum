@@ -267,8 +267,7 @@
      - rhmap
      - rhmap_config_demo
 - name: Build Mobile App
-  command: fhc build app={{ mobileApp_info_object.guid }} cloud_app={{ cloudApp_info_object.guid }} destination=android project={{ project_info_object
-.guid }} environment=demo
+  command: fhc build app={{ mobileApp_info_object.guid }} cloud_app={{ cloudApp_info_object.guid }} destination=android project={{ project_info_object.guid }} environment=demo
   tags:
      - rhmap_config
      - rhmap
