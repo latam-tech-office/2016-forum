@@ -7,7 +7,7 @@ labels:
   group: forum
 metadata:
   annotations:
-    description: LATAM Red Hat Forum 2016. Example of different MicroServices
+    description: LATAM Red Hat Forum 2017. Example of different MicroServices
     iconClass: icon-jenkins
     tags: brms cars flights fuse hotels
   name: forum-apps
