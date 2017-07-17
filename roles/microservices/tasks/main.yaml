@@ -40,6 +40,6 @@
      - microservices
 
 - name: Create the application based on a template
-  command: oc new-app --file=templates/forum-apps-template.yaml --param=REPOSITORY_USER={{ username }} --param=GOGS_URL={{ gogs_url }} --param=NEXUS_URL={{ nexus_url }} --namespace {{ microservices_namespace }}
+  command: oc new-app --file=templates/forum-apps-template.yaml --param=REPOSITORY_USER={{ username }} --param=GOGS_URL={{ gogs_url }} --param=NEXUS_URL={{ nexus_url }} --param=SERVICE_ID={{ fuse_service_id }} --param=SERVICE_TOKEN={{ fuse_service_token }} --param=USER_KEY={{ fuse_user_key }} --namespace {{ microservices_namespace }}
   tags: 
      - microservices
