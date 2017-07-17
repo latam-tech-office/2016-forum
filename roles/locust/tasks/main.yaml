@@ -5,7 +5,7 @@
      - locust
 
 - name: Creating the Project{{ ':' }} {{ locust_namespace }}
-  command: oadm new-project {{ locust_namespace }} --display-name="Locust{{ ":" }} LATAM Red Hat Forum 2016" --admin={{ username }}
+  command: oadm new-project {{ locust_namespace }} --display-name="Locust{{ ":" }} LATAM Red Hat Forum 2017" --admin={{ username }}
   register: create_namespace
   until: create_namespace.rc == 0
   retries: 10
