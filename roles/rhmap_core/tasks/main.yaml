@@ -44,7 +44,7 @@
      - rhmap
 
 - name: "Create a Core Project named \"{{ rhmap_project_core }}\""
-  command: "oadm new-project {{ rhmap_project_core }} --display-name=\"RHMAP Core{{ ':' }} LATAM Red Hat Forum 2016\" --admin={{ username }}"
+  command: "oadm new-project {{ rhmap_project_core }} --display-name=\"RHMAP Core{{ ':' }} LATAM Red Hat Forum 2017\" --admin={{ username }}"
   register: create_namespace
   until: create_namespace.rc == 0
   retries: 25
