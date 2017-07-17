@@ -38,7 +38,7 @@
      - tower
          
 - name: Create a Project{{ ':' }} {{ ansibletower_namespace }} 
-  command: oadm new-project {{ ansibletower_namespace }} --display-name="Ansible Tower{{ ':' }} LATAM Red Hat Forum 2016" --admin={{ username }}
+  command: oadm new-project {{ ansibletower_namespace }} --display-name="Ansible Tower{{ ':' }} LATAM Red Hat Forum 2017" --admin={{ username }}
   register: create_namespace
   until: create_namespace.rc == 0
   retries: 10
@@ -281,7 +281,8 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "OpenShift Enterprise 3 Project","description": "Project for Automating OpenShift Enterprise 3","local_path": "","scm_type": "git","scm_url": "https://github.com/latam-tech-office/2016-forum","scm_branch": "","scm_clean": true,"scm_delete_on_update": true,"credential": null,"organization": 1,"scm_update_on_launch": true,"scm_update_cache_timeout": 0}'
+    body: '{"name": "OpenShift Enterprise 3 Project","description": "Project for Automating OpenShift Enterprise 3","local_path": "","scm_type": "git","scm_url": "https://github.com/latam-tech-office/
+    -forum","scm_branch": "","scm_clean": true,"scm_delete_on_update": true,"credential": null,"organization": 1,"scm_update_on_launch": true,"scm_update_cache_timeout": 0}'
     status_code: 201
   ignore_errors: True
   tags:
@@ -454,7 +455,7 @@
        - createjobtemplatestower
        - reconfigtower
 
-- name: Creating "Create RHT Forum LATAM 2016 Apps in OpenShift 3" Job Template within Ansible Tower
+- name: Creating "Create RHT Forum LATAM 2017 Apps in OpenShift 3" Job Template within Ansible Tower
   uri:
     method: POST
     body_format: json
@@ -465,7 +466,7 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Create RHT Forum LATAM 2016 Apps in OpenShift 3","description": "Create RHT Forum LATAM 2016 Apps in OpenShift 3","job_type": "run","inventory": 34,"project": 37,"playbook": "cfme-tower-create-forum-2016-applications.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\ntooling_namespace: {{ tooling_namespace }}\nmicroservices_namespace: {{ microservices_namespace }}\nusername: {{ username }}","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Create RHT Forum LATAM 2017 Apps in OpenShift 3","description": "Create RHT Forum LATAM 2017 Apps in OpenShift 3","job_type": "run","inventory": 34,"project": 37,"playbook": "cfme-tower-create-forum-2016-applications.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\ntooling_namespace: {{ tooling_namespace }}\nmicroservices_namespace: {{ microservices_namespace }}\nusername: {{ username }}","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
@@ -502,7 +503,7 @@
        - createjobtemplatestower
        - reconfigtower
 
-- name: Creating "Delete RHT Forum LATAM 2016 Apps in OpenShift 3" Job Template within Ansible Tower
+- name: Creating "Delete RHT Forum LATAM 2017 Apps in OpenShift 3" Job Template within Ansible Tower
   uri:
     method: POST
     body_format: json
@@ -513,7 +514,7 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "Delete RHT Forum LATAM 2016 Apps in OpenShift 3","description": "Delete RHT Forum LATAM 2016 Apps in OpenShift 3","job_type": "run","inventory": 34,"project": 37,"playbook": "cfme-tower-delete-forum-2016-applications.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nmicroservices_namespace: {{ microservices_namespace }}","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
+    body: '{"name": "Delete RHT Forum LATAM 2017 Apps in OpenShift 3","description": "Delete RHT Forum LATAM 2017 Apps in OpenShift 3","job_type": "run","inventory": 34,"project": 37,"playbook": "cfme-tower-delete-forum-2016-applications.yml","credential": 34,"cloud_credential": null,"network_credential": null,"forks": 0,"limit": "{{ openshift_master_hostname }}","verbosity": 1,"extra_vars": "---\nmicroservices_namespace: {{ microservices_namespace }}","job_tags": "","force_handlers": false,"skip_tags": "","start_at_task": "","host_config_key": "","ask_variables_on_launch": true,"ask_limit_on_launch": false,"ask_tags_on_launch": false,"ask_job_type_on_launch": false,"ask_inventory_on_launch": false,"ask_credential_on_launch": false,"survey_enabled": false,"become_enabled": false,"allow_simultaneous": false}'
     status_code: 201
   register: result
   until: result.status == 201
