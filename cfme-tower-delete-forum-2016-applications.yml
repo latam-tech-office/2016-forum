@@ -1,4 +1,4 @@
-- name: Delete RHT Forum LATAM 2016 Application in OpenShift Enterprise 3 via CloudForms+Tower
+- name: Delete RHT Forum LATAM 2017 Application in OpenShift Enterprise 3 via CloudForms+Tower
   hosts: all
   gather_facts: false
   connection: ssh
