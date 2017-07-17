@@ -134,10 +134,12 @@
     validate_certs: False
     follow_redirects: none
     method: GET
-    user: "{{ openshift_username }}"
-    password: "{{ openshift_password }}"
+    user: "{{ username }}"
+    password: "{{ password }}"
     force_basic_auth: True
     status_code: 302
+    headers:
+      X-CSRF-Token: "1"
   register: authorization_request
   tags:
      - rhmap_config
