@@ -7,7 +7,7 @@
      - cloudforms
 
 - name: Create a Project{{ ':' }} {{ cloudforms_namespace }} 
-  command: oadm new-project {{ cloudforms_namespace }} --display-name="CloudForms{{ ':' }} LATAM Red Hat Forum 2016" --admin={{ username }}
+  command: oadm new-project {{ cloudforms_namespace }} --display-name="CloudForms{{ ':' }} LATAM Red Hat Forum 2017" --admin={{ username }}
   register: create_namespace
   until: create_namespace.rc == 0
   retries: 60
@@ -157,7 +157,7 @@
        - configcloudforms
        - createuserscloudforms 
        
-- name: Adding Red Hat Forum LATAM 2016 Tenant to CloudForms
+- name: Adding Red Hat Forum LATAM 2017 Tenant to CloudForms
   uri:
     method: POST
     body_format: json
@@ -169,7 +169,7 @@
     password: "{{ cloudforms_password }}"
     force_basic_auth: yes
     status_code: 200
-    body: '{"name": "RHT Forum Tenant","description": "Red Hat Forum LATAM 2016 Tenant","parent": {"href": "{{ cloudforms_full_url }}/api/tenants/1000000000001"}}'
+    body: '{"name": "RHT Forum Tenant","description": "Red Hat Forum LATAM 2017 Tenant","parent": {"href": "{{ cloudforms_full_url }}/api/tenants/1000000000001"}}'
   tags:
        - cloudforms
        - configcloudforms
