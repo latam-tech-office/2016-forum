@@ -26,7 +26,7 @@
      - cleanup
 
 - name: Create a Project{{ ':' }} {{ microservices_namespace }} 
-  command: oadm new-project {{ microservices_namespace }} --display-name="MicroServices{{ ':' }} LATAM Red Hat Forum 2016" --admin={{ username }}
+  command: oadm new-project {{ microservices_namespace }} --display-name="MicroServices{{ ':' }} LATAM Red Hat Forum 2017" --admin={{ username }}
   register: create_namespace
   until: create_namespace.rc == 0
   retries: 10
