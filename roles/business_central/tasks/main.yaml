@@ -52,7 +52,7 @@
      - project_creation
 
 - name: Create a new project name {{ businesscentral_namespace }} for a user {{ username }}
-  command: oadm new-project {{ businesscentral_namespace }} --display-name="Business Central{{ ':' }} LATAM Red Hat Forum 2016" --admin={{ username }}
+  command: oadm new-project {{ businesscentral_namespace }} --display-name="Business Central{{ ':' }} LATAM Red Hat Forum 2017" --admin={{ username }}
   register: project_creation
   until: project_creation.rc == 0
   retries: 30
