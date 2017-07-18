@@ -27,18 +27,6 @@ parameters:
   required: true
   description: "The username used in Gogs's Repository"
   value: demo
-- name: "SERVICE_ID"
-  displayName: 3Scale Service ID
-  description: "The ID of the Service defined in 3Scale AMP"
-  required: true
-- name: "SERVICE_TOKEN"
-  displayName: 3Scale Service Token
-  description: "The Token for the Service ID defined in 3Scale AMP"
-  required: true
-- name: "USER_KEY"
-  displayName: 3scale Application User Key
-  description: "The User Key for the Application defined in 3Scale AMP"
-  required: true
 objects:
 # BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS 
 #    BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS BRMS 
@@ -680,7 +668,7 @@ objects:
         forcePull: true
         from:
           kind: ImageStreamTag
-          name: fis-java-openshift:2.0
+          name: fis-java-openshift:1.0
           namespace: openshift
       type: Source
     triggers:
@@ -734,16 +722,6 @@ objects:
         containers:
         - image: library/fuse:latest
           name: fuse
-          env:
-            -
-              name: SERVICE_ID
-              value: "${SERVICE_ID}"
-            -
-              name: USER_KEY
-              value: "${USER_KEY}"
-            -
-              name: SERVICE_TOKEN
-              value: "${SERVICE_TOKEN}"
           ports:
           - containerPort: 8778
             name: jolokia
