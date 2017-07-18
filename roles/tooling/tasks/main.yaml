@@ -124,7 +124,7 @@
 - name: Import into BRMS Content
   uri: method=POST body_format=json url={{ gogs_url }}/api/v1/repos/migrate
        user={{ username }} password={{ password }} force_basic_auth=yes
-       body="{\"clone_addr\"{{ ":" }}\"https{{ ":" }}//github.com/latam-tech-office/rhforum2017brms.git\",\"uid\"{{ ":" }} 1,\"repo_name\"{{ ":" }} \"brms\"}"
+       body="{\"clone_addr\"{{ ":" }}\"https{{ ":" }}//github.com/pstlatam/rhforum2016brms.git\",\"uid\"{{ ":" }} 1,\"repo_name\"{{ ":" }} \"brms\"}"
   register: json_result
   failed_when: 
          - json_result.status != 201
@@ -137,7 +137,7 @@
 - name: Import into Forum Content
   uri: method=POST body_format=json url={{ gogs_url }}/api/v1/repos/migrate
        user={{ username }} password={{ password }} force_basic_auth=yes
-       body="{\"clone_addr\"{{ ":" }}\"https{{ ":" }}//github.com/latam-tech-office/rhforum2017Apps.git\",\"uid\"{{ ":" }} 1,\"repo_name\"{{ ":" }} \"forum\"}"
+       body="{\"clone_addr\"{{ ":" }}\"https{{ ":" }}//github.com/pstlatam/rhforum2016.git\",\"uid\"{{ ":" }} 1,\"repo_name\"{{ ":" }} \"forum\"}"
   register: json_result
   failed_when: 
          - json_result.status != 201
