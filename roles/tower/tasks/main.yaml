@@ -281,8 +281,7 @@
     user: "{{ ansibletower_username }}"
     password: "{{ ansibletower_password }}"
     force_basic_auth: yes
-    body: '{"name": "OpenShift Enterprise 3 Project","description": "Project for Automating OpenShift Enterprise 3","local_path": "","scm_type": "git","scm_url": "https://github.com/latam-tech-office/
-    -forum","scm_branch": "","scm_clean": true,"scm_delete_on_update": true,"credential": null,"organization": 1,"scm_update_on_launch": true,"scm_update_cache_timeout": 0}'
+    body: '{"name": "OpenShift Enterprise 3 Project","description": "Project for Automating OpenShift Enterprise 3","local_path": "","scm_type": "git","scm_url": "https://github.com/latam-tech-office/2016-forum","scm_branch": "","scm_clean": true,"scm_delete_on_update": true,"credential": null,"organization": 1,"scm_update_on_launch": true,"scm_update_cache_timeout": 0}'
     status_code: 201
   ignore_errors: True
   tags:
