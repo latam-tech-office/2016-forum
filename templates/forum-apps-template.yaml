@@ -647,7 +647,7 @@ objects:
         name: fuse:latest
     resources: {}
     source:
-      contextDir: FISTravelAgency
+      contextDir: FuseTravelAgency
       git:
         ref: master
         uri: ${GOGS_URL}/${REPOSITORY_USER}/forum.git
