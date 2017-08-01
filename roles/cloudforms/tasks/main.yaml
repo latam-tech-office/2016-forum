@@ -193,23 +193,23 @@
        - configcloudforms
        - createproviderscloudforms 
        
-- name: Adding Ansible Tower Provider to CloudForms
-  uri:
-    method: POST
-    body_format: json
-    HEADER_Content-Type: application/json
-    validate_certs: no
-    return_content: yes
-    url: "{{ cloudforms_full_url }}/api/providers?provider_class=provider"
-    user: "{{ cloudforms_username }}"
-    password: "{{ cloudforms_password }}"
-    force_basic_auth: yes
-    status_code: 200
-    body: '{"type":"ManageIQ::Providers::AnsibleTower::Provider","name":"Ansible Tower 3","url":"http://towerweb.ansible-tower.svc.cluster.local/api/v1","credentials": {"userid":"admin","password":"password"}}'
-  tags:
-       - cloudforms
-       - configcloudforms
-       - createproviderscloudforms
+#- name: Adding Ansible Tower Provider to CloudForms
+#  uri:
+#    method: POST
+#    body_format: json
+#    HEADER_Content-Type: application/json
+#    validate_certs: no
+#    return_content: yes
+#    url: "{{ cloudforms_full_url }}/api/providers?provider_class=provider"
+#    user: "{{ cloudforms_username }}"
+#    password: "{{ cloudforms_password }}"
+#    force_basic_auth: yes
+#    status_code: 200
+#    body: '{"type":"ManageIQ::Providers::AnsibleTower::Provider","name":"Ansible Tower 3","url":"http://towerweb.ansible-tower.svc.cluster.local/api/v1","credentials": {"userid":"admin","password":"password"}}'
+#  tags:
+#       - cloudforms
+#       - configcloudforms
+#       - createproviderscloudforms
 
 - name: Adding Service Catalog to CloudForms
   uri:
